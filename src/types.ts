@@ -1,4 +1,4 @@
-// Shared types for preflight.lol
+// Shared types for xhttp.lol
 
 export type Severity = 'critical' | 'high' | 'warning' | 'info' | 'pass';
 

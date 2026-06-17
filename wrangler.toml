@@ -1,4 +1,4 @@
-name = "preflight-lol"
+name = "xhttp-lol"
 main = "src/worker.ts"
 compatibility_date = "2024-09-25"
 compatibility_flags = ["nodejs_compat"]
@@ -12,16 +12,16 @@ binding = "CACHE"
 id = "99fb192bba6c448e937d2b439d02b41b"
 
 [[routes]]
-pattern = "preflight.lol/*"
-zone_id = "5d94df097b562e7168c115c02a12a9d9"
+pattern = "xhttp.lol/*"
+zone_id = "0bd021b3bdd02cc96aa6e1f0e14642f8"
 
 [[routes]]
-pattern = "preflight.lol"
-zone_id = "5d94df097b562e7168c115c02a12a9d9"
+pattern = "xhttp.lol"
+zone_id = "0bd021b3bdd02cc96aa6e1f0e14642f8"
 
 [[routes]]
-pattern = "mta-sts.preflight.lol/*"
-zone_id = "5d94df097b562e7168c115c02a12a9d9"
+pattern = "mta-sts.xhttp.lol/*"
+zone_id = "0bd021b3bdd02cc96aa6e1f0e14642f8"
 
 [[durable_objects.bindings]]
 name = "RATE_LIMITER"

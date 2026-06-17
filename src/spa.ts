@@ -1,4 +1,4 @@
-// SPA renderer for preflight.lol — dark-mode-first, orange accent, design system compliant
+// SPA renderer for xhttp.lol — dark-mode-first, orange accent, design system compliant
 
 import type { ScanResult } from './types';
 
@@ -8,7 +8,7 @@ function esc(s: string): string {
 
 export function html(path: string, nonce: string, data?: Partial<ScanResult>): string {
   const domain = data?.url ? new URL(data.url).hostname : '';
-  const title = domain ? `${domain} — preflight.lol` : 'preflight.lol — The HTTP response debugger.';
+  const title = domain ? `${domain} — xhttp.lol` : 'xhttp.lol — The HTTP response debugger.';
   const desc = domain && data?.grade
     ? `Security scan: ${domain} scored ${data.grade}. Headers, CORS, CSP, redirects, cache.`
     : 'CORS, CSP, security headers, redirects, cache — one command. No accounts, no tracking.';
@@ -34,18 +34,18 @@ export function html(path: string, nonce: string, data?: Partial<ScanResult>): s
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(desc)}">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://preflight.lol${data ? '/' + esc(domain) : ''}">
+<meta property="og:url" content="https://xhttp.lol${data ? '/' + esc(domain) : ''}">
 <meta name="twitter:card" content="summary">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="canonical" href="https://preflight.lol${path === '/' ? '' : esc(path)}">
+<link rel="canonical" href="https://xhttp.lol${path === '/' ? '' : esc(path)}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script type="application/ld+json"${nonceAttr}>${JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: 'preflight.lol',
-    url: 'https://preflight.lol',
+    name: 'xhttp.lol',
+    url: 'https://xhttp.lol',
     description: 'The HTTP response debugger. CORS, CSP, security headers, redirects, cache.',
     applicationCategory: 'SecurityApplication',
     operatingSystem: 'Any',
@@ -61,13 +61,13 @@ ${styles()}
 </div>
 <div class="page">
   <header class="hdr">
-    <a href="/" class="logo">preflight<span>.lol</span></a>
+    <a href="/" class="logo">xhttp<span>.lol</span></a>
     <span class="tag">HTTP response debugger</span>
   </header>
   <div class="input-wrap">
     <form action="/" method="GET" id="scanForm">
       <span class="p">$</span>
-      <span class="cm">preflight</span>
+      <span class="cm">xhttp</span>
       <span class="dm">&nbsp;▸&nbsp;</span>
       <input class="di" name="d" type="text" placeholder="example.com" value="${esc(domain)}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Domain to scan">
     </form>
@@ -255,7 +255,7 @@ function scripts(nonce: string): string {
 function footer(): string {
   return `<footer class="ftr">
   <div>
-    <a href="https://github.com/yokedotlol/preflight-lol">GitHub</a> ·
+    <a href="https://github.com/yokedotlol/xhttp">GitHub</a> ·
     <a href="/api/docs">API</a> ·
     <a href="/cli">CLI</a> ·
     <a href="/about">About</a> ·
@@ -309,13 +309,13 @@ function landingPage(): string {
   </div>
   <div class="code-block">
     <span class="cmt"># Full scan</span><br>
-    <span class="kw">$</span> curl <span class="str">preflight.lol/example.com</span><br><br>
+    <span class="kw">$</span> curl <span class="str">xhttp.lol/example.com</span><br><br>
     <span class="cmt"># CORS only</span><br>
-    <span class="kw">$</span> curl <span class="str">preflight.lol/example.com/cors</span><br><br>
+    <span class="kw">$</span> curl <span class="str">xhttp.lol/example.com/cors</span><br><br>
     <span class="cmt"># Simulate a CORS request</span><br>
-    <span class="kw">$</span> curl -X POST <span class="str">preflight.lol/cors</span> -d '{"target":"https://api.example.com","origin":"https://app.example.com"}'<br><br>
+    <span class="kw">$</span> curl -X POST <span class="str">xhttp.lol/cors</span> -d '{"target":"https://api.example.com","origin":"https://app.example.com"}'<br><br>
     <span class="cmt"># Decode a browser CORS error</span><br>
-    <span class="kw">$</span> curl -X POST <span class="str">preflight.lol/error</span> -d '{"error":"No Access-Control-Allow-Origin header..."}'
+    <span class="kw">$</span> curl -X POST <span class="str">xhttp.lol/error</span> -d '{"error":"No Access-Control-Allow-Origin header..."}'
   </div>`;
 }
 
@@ -544,8 +544,8 @@ function formatTTL(seconds: number): string {
 
 function aboutPage(): string {
   return `<div class="prose">
-  <h2>About preflight.lol</h2>
-  <p>preflight.lol is the HTTP response debugger. It analyzes CORS policies, CSP directives, security headers, redirect chains, and cache behavior — and tells you exactly what's wrong and how to fix it.</p>
+  <h2>About xhttp.lol</h2>
+  <p>xhttp.lol is the HTTP response debugger. It analyzes CORS policies, CSP directives, security headers, redirect chains, and cache behavior — and tells you exactly what's wrong and how to fix it.</p>
   <h3>Why?</h3>
   <p>Because CORS errors are the most frustrating part of web development. Because CSP policies are hard to get right. Because you shouldn't need to memorize which security headers exist and what they do. One command. Real answers. Fix suggestions with actual server configs.</p>
   <h3>How it works</h3>
@@ -553,24 +553,24 @@ function aboutPage(): string {
   <h3>Part of the .lol family</h3>
   <p><a href="https://yoke.lol">yoke.lol</a> — full domain intelligence · <a href="https://certs.lol">certs.lol</a> — TLS/SSL analysis · <a href="https://ns.lol">ns.lol</a> — DNS toolkit</p>
   <h3>Contact</h3>
-  <p><a href="mailto:hello@preflight.lol">hello@preflight.lol</a> · <a href="https://github.com/yokedotlol/preflight-lol">GitHub</a></p>
+  <p><a href="mailto:hello@xhttp.lol">hello@xhttp.lol</a> · <a href="https://github.com/yokedotlol/xhttp">GitHub</a></p>
   </div>`;
 }
 
 function privacyPage(): string {
   return `<div class="prose">
   <h2>Privacy</h2>
-  <p>preflight.lol does not track you. No cookies, no analytics, no advertising, no account required.</p>
+  <p>xhttp.lol does not track you. No cookies, no analytics, no advertising, no account required.</p>
   <p>We log scan counts per day (no domain names, no IPs) for capacity planning. Rate limiting uses your IP address in a Durable Object that expires after one hour.</p>
   <p>Scan results are cached for one hour in Cloudflare KV, keyed by domain name. No personal data is stored.</p>
-  <p><a href="mailto:hello@preflight.lol">hello@preflight.lol</a> for questions.</p>
+  <p><a href="mailto:hello@xhttp.lol">hello@xhttp.lol</a> for questions.</p>
   </div>`;
 }
 
 function termsPage(): string {
   return `<div class="prose">
   <h2>Terms</h2>
-  <p>preflight.lol is a free tool. Use it responsibly. Don't use it to probe systems you don't have permission to test.</p>
+  <p>xhttp.lol is a free tool. Use it responsibly. Don't use it to probe systems you don't have permission to test.</p>
   <p>Results are informational and may be incomplete or incorrect. Security decisions should not be based solely on this tool's output.</p>
   <p>We reserve the right to rate-limit or block abusive usage. No warranty, express or implied.</p>
   </div>`;
@@ -583,23 +583,23 @@ function cliPage(): string {
   </div>
   <div class="code-block">
     <span class="cmt"># Full scan</span><br>
-    <span class="kw">$</span> curl -s <span class="str">preflight.lol/example.com</span> | jq<br><br>
+    <span class="kw">$</span> curl -s <span class="str">xhttp.lol/example.com</span> | jq<br><br>
     <span class="cmt"># CORS only</span><br>
-    <span class="kw">$</span> curl -s <span class="str">preflight.lol/example.com/cors</span> | jq<br><br>
+    <span class="kw">$</span> curl -s <span class="str">xhttp.lol/example.com/cors</span> | jq<br><br>
     <span class="cmt"># CSP analysis</span><br>
-    <span class="kw">$</span> curl -s <span class="str">preflight.lol/example.com/csp</span> | jq<br><br>
+    <span class="kw">$</span> curl -s <span class="str">xhttp.lol/example.com/csp</span> | jq<br><br>
     <span class="cmt"># Security headers</span><br>
-    <span class="kw">$</span> curl -s <span class="str">preflight.lol/example.com/headers</span> | jq<br><br>
+    <span class="kw">$</span> curl -s <span class="str">xhttp.lol/example.com/headers</span> | jq<br><br>
     <span class="cmt"># Redirect chain</span><br>
-    <span class="kw">$</span> curl -s <span class="str">preflight.lol/example.com/chain</span> | jq<br><br>
+    <span class="kw">$</span> curl -s <span class="str">xhttp.lol/example.com/chain</span> | jq<br><br>
     <span class="cmt"># Cache behavior</span><br>
-    <span class="kw">$</span> curl -s <span class="str">preflight.lol/example.com/cache</span> | jq<br><br>
+    <span class="kw">$</span> curl -s <span class="str">xhttp.lol/example.com/cache</span> | jq<br><br>
     <span class="cmt"># Simulate CORS</span><br>
-    <span class="kw">$</span> curl -s -X POST <span class="str">preflight.lol/cors</span> \\<br>
+    <span class="kw">$</span> curl -s -X POST <span class="str">xhttp.lol/cors</span> \\<br>
     &nbsp;&nbsp;-H "Content-Type: application/json" \\<br>
     &nbsp;&nbsp;-d '{"target":"https://api.example.com","origin":"https://app.example.com"}' | jq<br><br>
     <span class="cmt"># Decode a CORS error</span><br>
-    <span class="kw">$</span> curl -s -X POST <span class="str">preflight.lol/error</span> \\<br>
+    <span class="kw">$</span> curl -s -X POST <span class="str">xhttp.lol/error</span> \\<br>
     &nbsp;&nbsp;-H "Content-Type: application/json" \\<br>
     &nbsp;&nbsp;-d '{"error":"No Access-Control-Allow-Origin header is present..."}' | jq
   </div>`;

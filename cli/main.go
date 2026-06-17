@@ -20,7 +20,7 @@ var (
 	commit  = "none"
 )
 
-const apiBase = "https://preflight.lol"
+const apiBase = "https://xhttp.lol"
 
 var isTTY = isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd())
 
@@ -255,7 +255,7 @@ func fetchJSON(url string, target interface{}) error {
 		return err
 	}
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", fmt.Sprintf("preflight-cli/%s", version))
+	req.Header.Set("User-Agent", fmt.Sprintf("xhttp-cli/%s", version))
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -287,7 +287,7 @@ func postJSON(url string, body interface{}, target interface{}) error {
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", fmt.Sprintf("preflight-cli/%s", version))
+	req.Header.Set("User-Agent", fmt.Sprintf("xhttp-cli/%s", version))
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -310,7 +310,7 @@ func postJSON(url string, body interface{}, target interface{}) error {
 
 func renderBanner(domain string) {
 	fmt.Println()
-	fmt.Printf("  %s — %s\n", titleStyle.Render("preflight.lol"), labelStyle.Render(domain))
+	fmt.Printf("  %s — %s\n", titleStyle.Render("xhttp.lol"), labelStyle.Render(domain))
 	fmt.Printf("  %s\n\n", dimStyle.Render(strings.Repeat("━", 40)))
 }
 
@@ -578,9 +578,9 @@ func main() {
 	var jsonOutput bool
 
 	rootCmd := &cobra.Command{
-		Use:   "preflight <domain>",
+		Use:   "xhttp <domain>",
 		Short: "HTTP response debugger — CORS, CSP, security headers, redirects, cache",
-		Long: `preflight.lol CLI — everything the browser sees and enforces.
+		Long: `xhttp.lol CLI — everything the browser sees and enforces.
 
 Scan any domain for CORS behavior, CSP policy, security headers, 
 redirect chains, and cache configuration. One command, full picture.`,
@@ -890,7 +890,7 @@ redirect chains, and cache configuration. One command, full picture.`,
 		Use:   "version",
 		Short: "Print version",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("preflight %s (%s)\n", version, commit)
+			fmt.Printf("xhttp %s (%s)\n", version, commit)
 		},
 	}
 

@@ -386,29 +386,29 @@ function rateLimitHeaders(_request: Request, _env: Env): Record<string, string> 
 // ── Static content ───────────────────────────────────────────────
 
 function robotsTxt(): string {
-  return `User-agent: *\nAllow: /\nSitemap: https://preflight.lol/sitemap.xml\n`;
+  return `User-agent: *\nAllow: /\nSitemap: https://xhttp.lol/sitemap.xml\n`;
 }
 
 function sitemapXml(): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://preflight.lol/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://preflight.lol/about</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://preflight.lol/api/docs</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://preflight.lol/cli</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://xhttp.lol/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://xhttp.lol/about</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://xhttp.lol/api/docs</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://xhttp.lol/cli</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
 </urlset>`;
 }
 
 function securityTxt(): string {
-  return `Contact: mailto:hello@preflight.lol
+  return `Contact: mailto:hello@xhttp.lol
 Expires: 2027-12-31T23:59:59.000Z
 Preferred-Languages: en
-Canonical: https://preflight.lol/.well-known/security.txt
+Canonical: https://xhttp.lol/.well-known/security.txt
 `;
 }
 
 function llmsTxt(): string {
-  return `# preflight.lol
+  return `# xhttp.lol
 > The HTTP response debugger. CORS, CSP, security headers, redirects, cache — one command.
 
 ## API
@@ -431,7 +431,7 @@ JSON by default. All responses include fix suggestions with server config docs.
 - https://ns.lol — DNS toolkit
 
 ## Source
-https://github.com/yokedotlol/preflight-lol (MIT)
+https://github.com/yokedotlol/xhttp (MIT)
 `;
 }
 

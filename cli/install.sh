@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Install preflight CLI — curl -sSL https://preflight.lol/install.sh | bash
+# Install xhttp CLI — curl -sSL https://xhttp.lol/install.sh | bash
 set -euo pipefail
 
-REPO="yokedotlol/preflight"
+REPO="yokedotlol/xhttp"
 
-echo "Installing preflight..."
+echo "Installing xhttp..."
 
 # Detect OS/arch
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -26,7 +26,7 @@ echo "  Version: $LATEST ($OS/$ARCH)"
 # Build download URL
 EXT="tar.gz"
 [ "$OS" = "windows" ] && EXT="zip"
-URL="https://github.com/$REPO/releases/download/$LATEST/preflight_${OS}_${ARCH}.${EXT}"
+URL="https://github.com/$REPO/releases/download/$LATEST/xhttp_${OS}_${ARCH}.${EXT}"
 
 # Download and extract
 TMP=$(mktemp -d)
@@ -46,12 +46,12 @@ fi
 INSTALL_DIR="/usr/local/bin"
 if [ ! -w "$INSTALL_DIR" ]; then
   echo "  Installing to $INSTALL_DIR (requires sudo)..."
-  sudo mv "$TMP/preflight" "$INSTALL_DIR/preflight"
+  sudo mv "$TMP/xhttp" "$INSTALL_DIR/xhttp"
 else
-  mv "$TMP/preflight" "$INSTALL_DIR/preflight"
+  mv "$TMP/xhttp" "$INSTALL_DIR/xhttp"
 fi
-chmod +x "$INSTALL_DIR/preflight"
+chmod +x "$INSTALL_DIR/xhttp"
 
-echo "  ✓ Installed preflight $LATEST to $INSTALL_DIR/preflight"
+echo "  ✓ Installed xhttp $LATEST to $INSTALL_DIR/xhttp"
 echo ""
-echo "  Usage: preflight example.com"
+echo "  Usage: xhttp example.com"

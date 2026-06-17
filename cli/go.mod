@@ -1,4 +1,4 @@
-module github.com/yokedotlol/preflight/cli
+module github.com/yokedotlol/xhttp/cli
 
 go 1.22
 

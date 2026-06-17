@@ -1,17 +1,17 @@
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 version: 2
 
-project_name: preflight
+project_name: xhttp
 
 before:
   hooks:
     - bash -c "cd cli && go mod tidy"
 
 builds:
-  - id: preflight
+  - id: xhttp
     dir: cli
     main: .
-    binary: preflight
+    binary: xhttp
     ldflags:
       - -s -w
       - -X main.version={{.Version}}
@@ -43,21 +43,21 @@ changelog:
 release:
   github:
     owner: yokedotlol
-    name: preflight
+    name: xhttp
   draft: false
   prerelease: auto
   name_template: "v{{.Version}}"
 
 brews:
-  - name: preflight
+  - name: xhttp
     repository:
       owner: yokedotlol
       name: homebrew-tap
     directory: Formula
-    homepage: https://preflight.lol
+    homepage: https://xhttp.lol
     description: "HTTP response debugger — CORS, CSP, security headers, redirects, cache"
     license: MIT
     install: |
-      bin.install "preflight"
+      bin.install "xhttp"
     test: |
-      assert_match version.to_s, shell_output("#{bin}/preflight version")
+      assert_match version.to_s, shell_output("#{bin}/xhttp version")
