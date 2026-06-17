@@ -90,18 +90,18 @@ function styles(): string {
 body[data-theme="dark"]{
   --bg:#0a0a12;--surface:#15151f;--surface-raised:#1e1e2a;--surface-hover:#26263a;--border:#2a2a3a;--border-muted:#1e1e2a;
   --text:#e0e0ea;--text-secondary:#a8a8b8;--muted:#7a7a8e;--dim:#55556a;--faint:#3a3a4a;
-  --accent:#f97316;--accent-fg:#0a0a12;--accent-dim:rgba(249,115,22,0.08);--accent-subtle:rgba(249,115,22,0.08);
+  --accent:#d4a24c;--accent-fg:#0a0a12;--accent-dim:rgba(212,162,76,0.10);--accent-subtle:rgba(212,162,76,0.10);
   --ok:#3fb950;--ok-subtle:rgba(63,185,80,0.08);
   --info:#6ea8fe;--warn:#e5a820;--warn-subtle:rgba(229,168,32,0.08);--err:#f85149;--err-subtle:rgba(248,81,73,0.08);
-  --purple:#bc8cff;--teal:#14b8a6;--blue:#3b82f6;--orange:#f97316;
+  --purple:#bc8cff;--teal:#14b8a6;--blue:#3b82f6;--orange:#d4a24c;
 }
 body[data-theme="light"]{
   --bg:#fafafe;--surface:#f0f0f5;--surface-raised:#e8e8ef;--surface-hover:#dddde6;--border:#d0d0dc;--border-muted:#e0e0ea;
   --text:#1a1a2e;--text-secondary:#4a4a60;--muted:#6a6a80;--dim:#9090a4;--faint:#b8b8c8;
-  --accent:#ea580c;--accent-fg:#ffffff;--accent-dim:rgba(234,88,12,0.06);--accent-subtle:rgba(234,88,12,0.06);
+  --accent:#b8860b;--accent-fg:#ffffff;--accent-dim:rgba(184,134,11,0.08);--accent-subtle:rgba(184,134,11,0.08);
   --ok:#16a34a;--ok-subtle:rgba(22,163,74,0.06);
   --info:#2563eb;--warn:#b58900;--warn-subtle:rgba(181,137,0,0.06);--err:#dc2626;--err-subtle:rgba(220,38,38,0.06);
-  --purple:#8250df;--teal:#0d9488;--blue:#2563eb;--orange:#ea580c;
+  --purple:#8250df;--teal:#0d9488;--blue:#2563eb;--orange:#b8860b;
 }
 html{background:var(--bg)}
 body{background:var(--bg);color:var(--text);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;line-height:1.6;transition:background .25s,color .25s}
@@ -376,19 +376,73 @@ function renderSecurityHeaders(h: ScanResult['security_headers']): string {
 
 function renderCSP(csp: ScanResult['csp']): string {
   if (!csp) return '';
+
+  // No CSP at all
+  if (!csp.present) {
+    return `
+    <div class="section">
+      <div class="section-title">Content Security Policy · Grade: ${esc(csp.grade)} · Not present</div>
+      <div class="section-body">
+        <div style="color:var(--dim);font-size:13px;padding:8px 0">No Content-Security-Policy header detected. The browser will load resources from any source.</div>
+      </div>
+    </div>
+    ${renderFindings('CSP Issues', csp.issues)}`;
+  }
+
+  // CSP present — render directive table
+  const parsed = csp.parsed || {};
+  const directives = Object.entries(parsed);
+
+  // Color-code values by risk
+  const dangerousValues = new Set(["'unsafe-inline'", "'unsafe-eval'", "'unsafe-hashes'", "data:", "blob:", "*"]);
+  const cautionValues = new Set(["'unsafe-inline'"]); // in style-src it's common but still flagged
+
+  function colorValue(directive: string, value: string): string {
+    const v = value.toLowerCase().trim();
+    if (v === '*') return `<span style="color:var(--err);font-weight:600">${esc(value)}</span>`;
+    if (dangerousValues.has(v)) return `<span style="color:var(--err)">${esc(value)}</span>`;
+    if (v.startsWith("'nonce-") || v.startsWith("'sha256-") || v.startsWith("'sha384-") || v.startsWith("'sha512-")) {
+      return `<span style="color:var(--ok)">${esc(value)}</span>`;
+    }
+    if (v === "'self'" || v === "'none'" || v === "'strict-dynamic'") {
+      return `<span style="color:var(--ok)">${esc(value)}</span>`;
+    }
+    if (v === "'report-sample'") return `<span style="color:var(--info)">${esc(value)}</span>`;
+    // URLs/domains
+    return `<span style="color:var(--text)">${esc(value)}</span>`;
+  }
+
+  const directiveRows = directives.map(([dir, values]) => {
+    const coloredValues = (values as string[]).map(v => colorValue(dir, v)).join(' ');
+    return `
+      <div class="row" style="align-items:flex-start">
+        <span class="row-label" style="min-width:140px;flex-shrink:0">${esc(dir)}</span>
+        <span class="row-value" style="text-align:left;font-size:12px;word-break:break-all;max-width:none;flex:1">${coloredValues}</span>
+      </div>`;
+  }).join('');
+
+  // Show missing recommended directives
+  const recommended = ['default-src', 'script-src', 'style-src', 'img-src', 'font-src', 'connect-src', 'frame-ancestors', 'base-uri', 'form-action', 'object-src'];
+  const missing = recommended.filter(d => !parsed[d]);
+
   return `
   <div class="section">
     <div class="section-title">Content Security Policy · Grade: ${esc(csp.grade)} · ${csp.mode}</div>
-    <div class="section-body">
-      ${csp.raw
-        ? `<div class="code-block" style="font-size:11px;word-break:break-all">${esc(csp.raw)}</div>`
-        : `<div style="color:var(--dim);font-size:13px">No CSP header present.</div>`
-      }
-      ${csp.missing_directives.length
-        ? `<div style="margin-top:12px;font-size:12px;color:var(--text-secondary)"><strong>Missing directives:</strong> ${csp.missing_directives.map(d => `<code>${esc(d)}</code>`).join(', ')}</div>`
-        : ''
-      }
+    <div class="section-body" style="padding:0">
+      ${directiveRows}
     </div>
+    ${missing.length ? `
+    <div style="padding:12px 16px;border-top:1px solid var(--border-muted)">
+      <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">Missing recommended directives</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">
+        ${missing.map(d => `<span style="padding:2px 8px;border-radius:10px;font-size:11px;font-family:var(--font-mono);background:var(--warn-subtle);color:var(--warn)">${esc(d)}</span>`).join('')}
+      </div>
+    </div>` : ''}
+    ${csp.raw ? `
+    <details style="padding:12px 16px;border-top:1px solid var(--border-muted)">
+      <summary style="font-size:11px;color:var(--dim);cursor:pointer;font-family:var(--font-mono)">Raw header value</summary>
+      <div class="code-block" style="font-size:10px;word-break:break-all;margin-top:8px">${esc(csp.raw)}</div>
+    </details>` : ''}
   </div>
   ${renderFindings('CSP Issues', csp.issues)}`;
 }

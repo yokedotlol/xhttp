@@ -1,9 +1,9 @@
 // Redirect chain follower — manually follows redirects, recording each hop
 
 import type { RedirectChainResult, RedirectHop, Finding } from './types';
+import { USER_AGENT, FETCH_TIMEOUT } from './constants';
 
 const MAX_HOPS = 20;
-const FETCH_TIMEOUT = 10_000;
 
 /** Follow a URL's redirect chain, recording per-hop details */
 export async function followRedirects(startUrl: string): Promise<RedirectChainResult> {
@@ -35,7 +35,7 @@ export async function followRedirects(startUrl: string): Promise<RedirectChainRe
         method: 'GET',
         redirect: 'manual',
         headers: {
-          'User-Agent': 'preflight.lol/1.0 (HTTP response debugger; +https://preflight.lol)',
+          'User-Agent': USER_AGENT,
           'Accept': 'text/html,application/xhtml+xml,*/*',
         },
         signal: AbortSignal.timeout(FETCH_TIMEOUT),
@@ -56,7 +56,14 @@ export async function followRedirects(startUrl: string): Promise<RedirectChainRe
 
     // Extract key headers for summary
     const headersSummary: Record<string, string> = {};
-    for (const key of ['server', 'x-powered-by', 'via', 'alt-svc']) {
+    for (const key of [
+      'server', 'x-powered-by', 'via', 'alt-svc',
+      'strict-transport-security', 'x-frame-options', 'x-content-type-options',
+      'referrer-policy', 'permissions-policy', 'content-security-policy',
+      'cross-origin-opener-policy', 'cross-origin-embedder-policy',
+      'cross-origin-resource-policy', 'cache-control', 'content-type',
+      'cf-cache-status', 'x-cache', 'age', 'vary',
+    ]) {
       const val = resp.headers.get(key);
       if (val) headersSummary[key] = val;
     }

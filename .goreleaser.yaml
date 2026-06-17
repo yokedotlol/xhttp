@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+version: 2
+
+project_name: preflight
+
+before:
+  hooks:
+    - bash -c "cd cli && go mod tidy"
+
+builds:
+  - id: preflight
+    dir: cli
+    main: .
+    binary: preflight
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.ShortCommit}}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - id: default
+    format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  use: github-native
+
+release:
+  github:
+    owner: yokedotlol
+    name: preflight
+  draft: false
+  prerelease: auto
+  name_template: "v{{.Version}}"
+
+brews:
+  - name: preflight
+    repository:
+      owner: yokedotlol
+      name: homebrew-tap
+    directory: Formula
+    homepage: https://preflight.lol
+    description: "HTTP response debugger — CORS, CSP, security headers, redirects, cache"
+    license: MIT
+    install: |
+      bin.install "preflight"
+    test: |
+      assert_match version.to_s, shell_output("#{bin}/preflight version")

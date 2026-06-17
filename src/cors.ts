@@ -1,8 +1,8 @@
 // CORS analysis — simulation, detection, fix generation
 
 import type { CORSResult, CORSSimulationRequest, CORSSimulationResult, Finding } from './types';
+import { USER_AGENT, FETCH_TIMEOUT } from './constants';
 
-const FETCH_TIMEOUT = 10_000;
 const DEFAULT_TEST_ORIGIN = 'https://example.com';
 
 const SERVER_DOCS: Record<string, string> = {
@@ -26,7 +26,7 @@ export async function analyzeCORS(targetUrl: string, testOrigin?: string): Promi
       method: 'OPTIONS',
       redirect: 'manual',
       headers: {
-        'User-Agent': 'preflight.lol/1.0 (CORS checker; +https://preflight.lol)',
+        'User-Agent': USER_AGENT,
         'Origin': origin,
         'Access-Control-Request-Method': 'GET',
         'Access-Control-Request-Headers': 'Content-Type',
@@ -46,7 +46,7 @@ export async function analyzeCORS(targetUrl: string, testOrigin?: string): Promi
       method: 'GET',
       redirect: 'manual',
       headers: {
-        'User-Agent': 'preflight.lol/1.0 (CORS checker; +https://preflight.lol)',
+        'User-Agent': USER_AGENT,
         'Origin': origin,
         'Accept': '*/*',
       },
@@ -130,7 +130,7 @@ export async function analyzeCORS(targetUrl: string, testOrigin?: string): Promi
         method: 'GET',
         redirect: 'manual',
         headers: {
-          'User-Agent': 'preflight.lol/1.0',
+          'User-Agent': USER_AGENT,
           'Origin': 'https://evil.example.com',
           'Accept': '*/*',
         },
@@ -205,7 +205,7 @@ export async function simulateCORS(req: CORSSimulationRequest): Promise<CORSSimu
 
   // Build preflight request
   const preflightHeaders: Record<string, string> = {
-    'User-Agent': 'preflight.lol/1.0 (CORS simulation; +https://preflight.lol)',
+    'User-Agent': USER_AGENT,
     'Origin': origin,
     'Access-Control-Request-Method': method,
   };
@@ -256,7 +256,7 @@ export async function simulateCORS(req: CORSSimulationRequest): Promise<CORSSimu
 
   // Send actual request with Origin
   const actualReqHeaders: Record<string, string> = {
-    'User-Agent': 'preflight.lol/1.0',
+    'User-Agent': USER_AGENT,
     'Origin': origin,
     'Accept': '*/*',
   };

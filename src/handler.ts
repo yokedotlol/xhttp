@@ -2,6 +2,7 @@
 
 import type { Env } from './worker';
 import type { ScanResult, CORSSimulationRequest, CORSErrorDecodeRequest, CSPEvaluateRequest } from './types';
+import { USER_AGENT } from './constants';
 import { analyzeCORS, simulateCORS } from './cors';
 import { evaluateCSP, evaluateCSPString } from './csp';
 import { analyzeSecurityHeaders } from './headers';
@@ -74,6 +75,7 @@ export async function handleRequest(request: Request, env: Env, ctx: ExecutionCo
   if (path === '/llms.txt') return new Response(llmsTxt(), { headers: { 'Content-Type': 'text/plain' } });
   if (path === '/favicon.svg') return new Response(faviconSvg(), { headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=604800' } });
   if (path === '/.well-known/mta-sts.txt') return new Response(mtaSts(), { headers: { 'Content-Type': 'text/plain' } });
+  if (path === '/install.sh') return Response.redirect('https://raw.githubusercontent.com/yokedotlol/preflight/main/cli/install.sh', 302);
   if (path === '/usage' && request.headers.get('Authorization') === `Bearer ${env.ADMIN_KEY}`) return handleUsage(env);
 
   // ── POST endpoints ─────────────────────────────────────────────
@@ -168,15 +170,31 @@ async function runScan(domain: string, _subRoute: string | null, env: Env): Prom
     fetchTLSVersion(domain, env),
   ]);
 
-  // Get final URL response headers for remaining analysis
+  // Fetch the final destination's FULL response headers for analysis
+  // The redirect chain only captures a summary — we need ALL headers
   const finalUrl = redirectResult.chain.length > 0
     ? redirectResult.chain[redirectResult.chain.length - 1].url
     : targetUrl;
-  const finalHeaders = redirectResult.chain.length > 0
-    ? redirectResult.chain[redirectResult.chain.length - 1].headers_summary
-    : {};
 
-  const headersObj = new Headers(finalHeaders);
+  let headersObj: Headers;
+  try {
+    const finalResp = await fetch(finalUrl, {
+      method: 'GET',
+      redirect: 'manual',
+      headers: {
+        'User-Agent': USER_AGENT,
+        'Accept': 'text/html,application/xhtml+xml,*/*',
+      },
+      signal: AbortSignal.timeout(10_000),
+    });
+    headersObj = finalResp.headers;
+  } catch {
+    // Fallback to sparse summary if direct fetch fails
+    const sparse = redirectResult.chain.length > 0
+      ? redirectResult.chain[redirectResult.chain.length - 1].headers_summary
+      : {};
+    headersObj = new Headers(sparse);
+  }
 
   const [cspResult, secHeadersResult, cacheResult] = await Promise.all([
     Promise.resolve(evaluateCSP(headersObj.get('content-security-policy'), headersObj)),
