@@ -228,6 +228,7 @@ async function runScan(domain: string, _subRoute: string | null, env: Env): Prom
         full_report: `https://yoke.lol/${domain}`,
         tls_details: `https://certs.lol/${domain}`,
         dns_details: `https://ns.lol/${domain}`,
+        email_validation: 'https://vrfy.lol',
       },
     },
   };
@@ -429,6 +430,7 @@ JSON by default. All responses include fix suggestions with server config docs.
 - https://yoke.lol — Full domain intelligence
 - https://certs.lol — TLS/SSL certificate analysis
 - https://ns.lol — DNS toolkit
+- https://vrfy.lol — Email validation
 
 ## Source
 https://github.com/yokedotlol/xhttp (MIT)

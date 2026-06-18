@@ -189,15 +189,21 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 .link-pill{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;color:var(--text-secondary);font-family:var(--font-mono);text-decoration:none;transition:all .15s}
 .link-pill:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
 
-.ftr{margin:3rem 0 2rem;padding-top:1.5rem;border-top:1px solid var(--border-muted);display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;font-size:12px;color:var(--dim);font-family:var(--font-mono)}
-.ftr a{color:var(--muted);text-decoration:none}.ftr a:hover{color:var(--accent)}
+.footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border-muted);text-align:center;font-size:0.8rem}
+.footer-links{display:flex;justify-content:center;gap:1.25rem;flex-wrap:wrap;margin-bottom:0.75rem}
+.footer-links a{color:var(--muted);text-decoration:none}.footer-links a:hover{color:var(--accent)}
+.footer-tagline{color:var(--muted);font-size:0.75rem;margin-bottom:0.5rem}
+.footer-tagline a{color:var(--accent);text-decoration:none}.footer-tagline a:hover{text-decoration:underline}
+.footer-family{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;font-family:var(--font-mono);font-size:0.75rem;margin-bottom:0.75rem}
+.footer-family a{color:var(--muted);text-decoration:none}.footer-family a:hover{color:var(--accent)}
+.yoke-badge{display:inline-block;margin-top:0.25rem}
 
 .rl-pill{position:fixed;bottom:16px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 10px;font-size:10px;font-family:var(--font-mono);color:var(--dim);z-index:100;display:none}
 
 .loading{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-@media(max-width:640px){.features{grid-template-columns:1fr}.grade-hero{flex-direction:column;align-items:flex-start;gap:12px}.grade-letter{font-size:48px}.ftr{flex-direction:column;gap:8px}}
+@media(max-width:640px){.features{grid-template-columns:1fr}.grade-hero{flex-direction:column;align-items:flex-start;gap:12px}.grade-letter{font-size:48px}}
 .prose{font-size:14px;color:var(--text-secondary);line-height:1.8;max-width:560px;margin:1.5rem 0}
 .prose h2{color:var(--text);font-size:16px;font-weight:700;margin:2rem 0 0.5rem}
 .prose h3{color:var(--text);font-size:14px;font-weight:600;margin:1.5rem 0 0.5rem}
@@ -253,20 +259,23 @@ function scripts(nonce: string): string {
 }
 
 function footer(): string {
-  return `<footer class="ftr">
-  <div>
-    <a href="https://github.com/yokedotlol/xhttp">GitHub</a> ·
-    <a href="/api/docs">API</a> ·
-    <a href="/cli">CLI</a> ·
-    <a href="/about">About</a> ·
-    <a href="/privacy">Privacy</a> ·
+  return `<footer class="footer">
+  <div class="footer-links">
+    <a href="https://github.com/yokedotlol/xhttp">GitHub</a>
+    <a href="/api/docs">API</a>
+    <a href="/cli">CLI</a>
+    <a href="/about">About</a>
+    <a href="/privacy">Privacy</a>
     <a href="/terms">Terms</a>
   </div>
-  <div>
-    <a href="https://yoke.lol">yoke.lol</a> ·
-    <a href="https://certs.lol">certs.lol</a> ·
-    <a href="https://ns.lol">ns.lol</a>
+  <div class="footer-tagline">Part of the <a href="https://yoke.lol/tools">.lol tools</a></div>
+  <div class="footer-family">
+    <a href="https://yoke.lol">yoke</a>
+    <a href="https://certs.lol">certs</a>
+    <a href="https://ns.lol">ns</a>
+    <a href="https://vrfy.lol">vrfy</a>
   </div>
+  <a href="https://yoke.lol/xhttp.lol" class="yoke-badge"><img src="https://yoke.lol/badge/xhttp.lol.svg" alt="Yoke score for xhttp.lol" height="20"></a>
 </footer>`;
 }
 
@@ -551,7 +560,7 @@ function aboutPage(): string {
   <h3>How it works</h3>
   <p>We send real HTTP requests to your target (including OPTIONS preflight requests) and analyze every response header. No JavaScript execution, no screenshots, no third-party APIs — just HTTP analysis at the protocol level.</p>
   <h3>Part of the .lol family</h3>
-  <p><a href="https://yoke.lol">yoke.lol</a> — full domain intelligence · <a href="https://certs.lol">certs.lol</a> — TLS/SSL analysis · <a href="https://ns.lol">ns.lol</a> — DNS toolkit</p>
+  <p><a href="https://yoke.lol">yoke.lol</a> — full domain intelligence · <a href="https://certs.lol">certs.lol</a> — TLS/SSL analysis · <a href="https://ns.lol">ns.lol</a> — DNS toolkit · <a href="https://vrfy.lol">vrfy.lol</a> — email validation</p>
   <h3>Contact</h3>
   <p><a href="mailto:hello@xhttp.lol">hello@xhttp.lol</a> · <a href="https://github.com/yokedotlol/xhttp">GitHub</a></p>
   </div>`;

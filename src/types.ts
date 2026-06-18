@@ -146,6 +146,7 @@ export interface ScanResult {
       full_report: string;
       tls_details: string;
       dns_details: string;
+      email_validation: string;
     };
   };
 }
