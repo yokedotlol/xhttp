@@ -31,7 +31,7 @@ jobs:
           if [ "$STATUS" != "200" ]; then echo "Homepage failed: $STATUS"; exit 1; fi
 
           # API JSON
-          CODE=$(curl -s -o /dev/null -w '%{http_code}' -X POST https://xhttp.lol/example.com -H 'Content-Type: application/json')
+          CODE=$(curl -s -o /dev/null -w '%{http_code}' https://xhttp.lol/example.com -H 'Accept: application/json')
           if [ "$CODE" != "200" ]; then echo "API failed: $CODE"; exit 1; fi
 
           echo "✅ Smoke tests passed (homepage 200, API $CODE)"
