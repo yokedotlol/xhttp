@@ -1,0 +1,37 @@
+name: Deploy
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: npx tsc --noEmit
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+
+  smoke:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for propagation
+        run: sleep 10
+      - name: Smoke test
+        run: |
+          # Homepage
+          STATUS=$(curl -s -o /dev/null -w '%{http_code}' https://xhttp.lol/)
+          if [ "$STATUS" != "200" ]; then echo "Homepage failed: $STATUS"; exit 1; fi
+
+          # API JSON
+          CODE=$(curl -s -o /dev/null -w '%{http_code}' -X POST https://xhttp.lol/example.com -H 'Content-Type: application/json')
+          if [ "$CODE" != "200" ]; then echo "API failed: $CODE"; exit 1; fi
+
+          echo "✅ Smoke tests passed (homepage 200, API $CODE)"
