@@ -138,6 +138,16 @@ export interface ScanResult {
     version: string | null;
     details: string;
   };
+  /** Domain intelligence from yoke (optional — only present when YOKE binding is available) */
+  domain_intel?: {
+    dnssec: boolean;
+    email_auth: {
+      spf: boolean;
+      dkim: boolean;
+      dmarc: boolean;
+      dmarc_policy: string | null;
+    };
+  };
   _meta: {
     version: string;
     scan_time_ms: number;

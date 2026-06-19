@@ -7,6 +7,10 @@ export interface Env {
   ADMIN_KEY: string;
   PROBE_URL: string;
   RATE_LIMITER: DurableObjectNamespace;
+  /** Yoke domain intelligence service binding (.lol family) */
+  YOKE?: Fetcher;
+  /** Shared key for .lol family service bindings */
+  SERVICE_KEY?: string;
 }
 
 export default {

@@ -10,6 +10,7 @@ import { followRedirects } from './redirect';
 import { analyzeCacheBehavior } from './cache-analysis';
 import { decodeCORSError } from './cors-error-decoder';
 import { trackScan, handleUsage } from './usage';
+import { fetchDomainSignals } from './services/domain-intel';
 
 const VERSION = '1.0.0';
 const CACHE_TTL = 3600; // 1 hour
@@ -164,10 +165,11 @@ async function runScan(domain: string, _subRoute: string | null, env: Env): Prom
   const targetUrl = `https://${domain}`;
 
   // Run all analyses in parallel
-  const [redirectResult, corsResult, tlsVersion] = await Promise.all([
+  const [redirectResult, corsResult, tlsVersion, yokeSignals] = await Promise.all([
     followRedirects(targetUrl),
     analyzeCORS(targetUrl),
     fetchTLSVersion(domain, env),
+    fetchDomainSignals(domain, env).catch(() => null),
   ]);
 
   // Fetch the final destination's FULL response headers for analysis
@@ -220,6 +222,12 @@ async function runScan(domain: string, _subRoute: string | null, env: Env): Prom
       version: tlsVersion,
       details: `→ certs.lol/${domain}`,
     },
+    ...(yokeSignals ? {
+      domain_intel: {
+        dnssec: yokeSignals.dnssec,
+        email_auth: yokeSignals.email_auth,
+      },
+    } : {}),
     _meta: {
       version: VERSION,
       scan_time_ms: scanTime,

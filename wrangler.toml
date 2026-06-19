@@ -33,3 +33,14 @@ new_classes = ["RateLimiterDO"]
 
 # Secrets (set via wrangler secret put):
 # ADMIN_KEY - shared probe auth key
+# SERVICE_KEY - shared key for .lol family service bindings
+
+# ─── Optional service bindings ───
+# These connect xhttp.lol to sibling .lol services for richer signals.
+# Self-hosters: remove any bindings you don't have deployed —
+# xhttp.lol falls back to its own checks automatically.
+
+# Yoke domain intelligence (email auth + DNSSEC from yoke's cache)
+[[services]]
+binding = "YOKE"
+service = "yoke"
