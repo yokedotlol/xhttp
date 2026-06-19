@@ -1,5 +1,5 @@
 {
-  "name": "preflight-lol",
+  "name": "xhttp-lol",
   "version": "1.0.0",
   "description": "The HTTP response debugger. CORS, CSP, security headers, redirects, cache.",
   "private": true,
