@@ -60,6 +60,8 @@ function normalizeDomain(raw: string): string | null {
   d = d.replace(/:\d+$/, '');
   if (!d || d.length > 253) return null;
   if (!/^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$/.test(d)) return null;
+  // Require at least one dot (FQDN — no bare labels like "asdfjkl")
+  if (!d.includes('.')) return null;
   return d;
 }
 
