@@ -118,27 +118,41 @@ export async function handleRequest(request: Request, env: Env, ctx: ExecutionCo
     return jsonResponse({ error: 'Not found' }, 404);
   }
 
-  // Rate limit
+  // Check cache first — cache hits don't consume rate-limit credit
+  const cacheKey = `scan:${domain}:${subRoute || 'full'}`;
+  const cached = await env.CACHE.get(cacheKey, 'json') as ScanResult | null;
+
+  if (cached) {
+    if (cached._meta) cached._meta.cache_hit = true;
+    trackScan(env, domain, ctx);
+
+    const wantsHtml = (request.headers.get('Accept') || '').includes('text/html');
+    if (wantsHtml) {
+      const nonce = crypto.randomUUID();
+      const { html } = await import('./spa');
+      return new Response(html(`/${domain}`, nonce, cached), {
+        headers: { 'Content-Type': 'text/html; charset=utf-8', ...secHeaders(nonce) },
+      });
+    }
+    if (subRoute) {
+      const filtered = filterResult(cached as ScanResult, subRoute);
+      if (!filtered) return jsonResponse({ error: `Unknown sub-route: ${subRoute}` }, 400);
+      return jsonResponse(filtered, 200, rateLimitHeaders(request, env));
+    }
+    return jsonResponse(cached, 200, rateLimitHeaders(request, env));
+  }
+
+  // Rate limit — only fresh scans count
   const rl = await checkRateLimit(request, env);
   if (rl) return rl;
 
   // Check if browser wants HTML
   const wantsHtml = (request.headers.get('Accept') || '').includes('text/html');
 
-  // Check cache
-  const cacheKey = `scan:${domain}:${subRoute || 'full'}`;
-  const cached = await env.CACHE.get(cacheKey, 'json') as ScanResult | null;
-
   let result: ScanResult | Partial<ScanResult>;
-
-  if (cached) {
-    result = cached;
-    if (result._meta) result._meta.cache_hit = true;
-  } else {
-    result = await runScan(domain, subRoute, env);
-    // Cache the result
-    ctx.waitUntil(env.CACHE.put(cacheKey, JSON.stringify(result), { expirationTtl: CACHE_TTL }));
-  }
+  result = await runScan(domain, subRoute, env);
+  // Cache the result
+  ctx.waitUntil(env.CACHE.put(cacheKey, JSON.stringify(result), { expirationTtl: CACHE_TTL }));
 
   // Track usage
   trackScan(env, domain, ctx);
