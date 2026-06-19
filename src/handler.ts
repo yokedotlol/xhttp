@@ -409,8 +409,8 @@ function sitemapXml(): string {
 }
 
 function securityTxt(): string {
-  return `Contact: mailto:hello@xhttp.lol
-Expires: 2027-12-31T23:59:59.000Z
+  return `Contact: https://github.com/yokedotlol/xhttp/issues
+Expires: 2027-06-18T00:00:00Z
 Preferred-Languages: en
 Canonical: https://xhttp.lol/.well-known/security.txt
 `;
