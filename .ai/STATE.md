@@ -66,6 +66,6 @@ Also: `/robots.txt`, `/sitemap.xml`, `/security.txt`, `/llms.txt`, `/favicon.svg
 
 ## Open / Known Issues
 
-- `package.json` still says `"name": "preflight-lol"` — should be updated to `xhttp-lol`
-- `/install.sh` redirects to `yokedotlol/preflight` — URL needs updating to `yokedotlol/xhttp`
-- `security.txt` contact email is `hello@xhttp.lol` — should be `hello@yoke.lol` per family convention (DECISIONS for vrfy: "hello@yoke.lol is the contact email for all .lol family tools")
+- ~~`package.json` still says `"name": "preflight-lol"`~~ — fixed, now `xhttp-lol`
+- ~~`/install.sh` redirects to `yokedotlol/preflight`~~ — fixed, now points to `yokedotlol/xhttp`
+- ~~contact email was `hello@xhttp.lol`~~ — fixed to `hello@yoke.lol` per family convention

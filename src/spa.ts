@@ -562,7 +562,7 @@ function aboutPage(): string {
   <h3>Part of the .lol family</h3>
   <p><a href="https://yoke.lol">yoke.lol</a> — full domain intelligence · <a href="https://certs.lol">certs.lol</a> — TLS/SSL analysis · <a href="https://ns.lol">ns.lol</a> — DNS toolkit · <a href="https://vrfy.lol">vrfy.lol</a> — email validation</p>
   <h3>Contact</h3>
-  <p><a href="mailto:hello@xhttp.lol">hello@xhttp.lol</a> · <a href="https://github.com/yokedotlol/xhttp">GitHub</a></p>
+  <p><a href="mailto:hello@yoke.lol">hello@yoke.lol</a> · <a href="https://github.com/yokedotlol/xhttp">GitHub</a></p>
   </div>`;
 }
 
@@ -572,7 +572,7 @@ function privacyPage(): string {
   <p>xhttp.lol does not track you. No cookies, no analytics, no advertising, no account required.</p>
   <p>We log scan counts per day (no domain names, no IPs) for capacity planning. Rate limiting uses your IP address in a Durable Object that expires after one hour.</p>
   <p>Scan results are cached for one hour in Cloudflare KV, keyed by domain name. No personal data is stored.</p>
-  <p><a href="mailto:hello@xhttp.lol">hello@xhttp.lol</a> for questions.</p>
+  <p><a href="mailto:hello@yoke.lol">hello@yoke.lol</a> for questions.</p>
   </div>`;
 }
 

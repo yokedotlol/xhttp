@@ -78,7 +78,7 @@ export async function handleRequest(request: Request, env: Env, ctx: ExecutionCo
   if (path === '/llms.txt') return new Response(llmsTxt(), { headers: { 'Content-Type': 'text/plain' } });
   if (path === '/favicon.svg') return new Response(faviconSvg(), { headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=604800' } });
   if (path === '/.well-known/mta-sts.txt') return new Response(mtaSts(), { headers: { 'Content-Type': 'text/plain' } });
-  if (path === '/install.sh') return Response.redirect('https://raw.githubusercontent.com/yokedotlol/preflight/main/cli/install.sh', 302);
+  if (path === '/install.sh') return Response.redirect('https://raw.githubusercontent.com/yokedotlol/xhttp/main/cli/install.sh', 302);
   if (path === '/usage' && request.headers.get('Authorization') === `Bearer ${env.ADMIN_KEY}`) return handleUsage(env);
 
   // ── POST endpoints ─────────────────────────────────────────────
@@ -116,6 +116,11 @@ export async function handleRequest(request: Request, env: Env, ctx: ExecutionCo
   if (!domain) {
     if (rawDomain) return jsonResponse({ error: 'Invalid domain', input: rawDomain }, 400);
     return jsonResponse({ error: 'Not found' }, 404);
+  }
+
+  // Reject IP addresses — xhttp scans domains, not IPs (SSRF guard for self-hosters)
+  if (isIP(domain)) {
+    return jsonResponse({ error: 'IP addresses are not supported — provide a domain name', input: rawDomain }, 400);
   }
 
   // Check cache first — cache hits don't consume rate-limit credit
