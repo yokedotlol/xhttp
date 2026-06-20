@@ -588,29 +588,85 @@ function termsPage(): string {
 function cliPage(): string {
   return `<div class="prose">
   <h2>CLI</h2>
-  <p>Coming soon. In the meantime, curl is your CLI:</p>
+  <p>HTTP response debugger. CORS, CSP, security headers, redirects, cache — runs entirely on your machine.</p>
+  <p style="display:flex;gap:6px;flex-wrap:wrap">
+    <span style="display:inline-block;background:#1a1520;border:1px solid #2a2030;border-radius:4px;padding:2px 8px;font-size:12px;color:#d4a24c">MIT</span>
+    <span style="display:inline-block;background:#1a1520;border:1px solid #2a2030;border-radius:4px;padding:2px 8px;font-size:12px;color:#d4a24c">Go</span>
+    <span style="display:inline-block;background:#1a1520;border:1px solid #2a2030;border-radius:4px;padding:2px 8px;font-size:12px;color:#d4a24c">Zero dependencies</span>
+  </p>
+  <p style="margin-top:0.75rem;padding:8px 12px;background:#111116;border-left:3px solid #3fb950;border-radius:4px;font-size:12px;color:#8e8e9a">🔒 <strong style="color:#3fb950">Privacy:</strong> This CLI never contacts xhttp.lol servers. All analysis runs directly from your machine to the target domain. No data leaves your network. <a href="https://github.com/yokedotlol/xhttp" style="color:#d4a24c">You can always self-host if you need privacy.</a></p>
+  </div>
+
+  <div class="prose">
+  <h3>Install</h3>
+  </div>
+  <div class="code-block">
+    <span class="cmt"># Homebrew</span><br>
+    <span class="kw">$</span> brew install yokedotlol/tap/xhttp<br><br>
+    <span class="cmt"># Or one-liner</span><br>
+    <span class="kw">$</span> curl -sSL <span class="str">https://xhttp.lol/install.sh</span> | bash<br><br>
+    <span class="cmt"># Or download from GitHub Releases</span><br>
+    <span class="kw">$</span> curl -sL <span class="str">https://github.com/yokedotlol/xhttp/releases/latest/download/xhttp_darwin_arm64.tar.gz</span> | tar xz<br>
+    <span class="kw">$</span> sudo mv xhttp /usr/local/bin/
+  </div>
+
+  <div class="prose">
+  <h3>Quick Start</h3>
   </div>
   <div class="code-block">
     <span class="cmt"># Full scan</span><br>
-    <span class="kw">$</span> curl -s <span class="str">xhttp.lol/example.com</span> | jq<br><br>
+    <span class="kw">$</span> xhttp <span class="str">example.com</span><br><br>
+    <span class="cmt"># JSON output (default when piped)</span><br>
+    <span class="kw">$</span> xhttp <span class="str">example.com</span> --json | jq<br><br>
     <span class="cmt"># CORS only</span><br>
-    <span class="kw">$</span> curl -s <span class="str">xhttp.lol/example.com/cors</span> | jq<br><br>
-    <span class="cmt"># CSP analysis</span><br>
-    <span class="kw">$</span> curl -s <span class="str">xhttp.lol/example.com/csp</span> | jq<br><br>
+    <span class="kw">$</span> xhttp cors <span class="str">example.com</span><br><br>
     <span class="cmt"># Security headers</span><br>
-    <span class="kw">$</span> curl -s <span class="str">xhttp.lol/example.com/headers</span> | jq<br><br>
+    <span class="kw">$</span> xhttp headers <span class="str">example.com</span><br><br>
+    <span class="cmt"># CSP analysis</span><br>
+    <span class="kw">$</span> xhttp csp <span class="str">example.com</span><br><br>
     <span class="cmt"># Redirect chain</span><br>
-    <span class="kw">$</span> curl -s <span class="str">xhttp.lol/example.com/chain</span> | jq<br><br>
+    <span class="kw">$</span> xhttp chain <span class="str">example.com</span><br><br>
     <span class="cmt"># Cache behavior</span><br>
-    <span class="kw">$</span> curl -s <span class="str">xhttp.lol/example.com/cache</span> | jq<br><br>
-    <span class="cmt"># Simulate CORS</span><br>
-    <span class="kw">$</span> curl -s -X POST <span class="str">xhttp.lol/cors</span> \\<br>
-    &nbsp;&nbsp;-H "Content-Type: application/json" \\<br>
-    &nbsp;&nbsp;-d '{"target":"https://api.example.com","origin":"https://app.example.com"}' | jq<br><br>
-    <span class="cmt"># Decode a CORS error</span><br>
-    <span class="kw">$</span> curl -s -X POST <span class="str">xhttp.lol/error</span> \\<br>
-    &nbsp;&nbsp;-H "Content-Type: application/json" \\<br>
-    &nbsp;&nbsp;-d '{"error":"No Access-Control-Allow-Origin header is present..."}' | jq
+    <span class="kw">$</span> xhttp cache <span class="str">example.com</span><br><br>
+    <span class="cmt"># Decode a CORS error from your browser console</span><br>
+    <span class="kw">$</span> xhttp error <span class="str">"No 'Access-Control-Allow-Origin' header is present..."</span><br><br>
+    <span class="cmt"># Simulate a CORS request</span><br>
+    <span class="kw">$</span> xhttp simulate <span class="str">https://api.example.com</span> --origin <span class="str">https://app.example.com</span>
+  </div>
+
+  <div class="prose">
+  <h3>Commands</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:13px;margin:0.75rem 0">
+    <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">xhttp &lt;domain&gt;</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Full scan (headers, CSP, CORS, redirects, cache, TLS)</td></tr>
+    <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">xhttp cors &lt;domain&gt;</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">CORS-focused scan with origin reflection detection</td></tr>
+    <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">xhttp headers &lt;domain&gt;</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Security headers scan and grading</td></tr>
+    <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">xhttp csp &lt;domain&gt;</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">CSP parsing, bypass detection, grading</td></tr>
+    <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">xhttp chain &lt;domain&gt;</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Redirect chain with per-hop timing</td></tr>
+    <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">xhttp cache &lt;domain&gt;</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Cache-Control, CDN detection, TTL</td></tr>
+    <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">xhttp error &lt;msg&gt;</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Decode a browser CORS error → diagnosis + fix</td></tr>
+    <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">xhttp simulate &lt;url&gt;</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Simulate CORS with custom origin/method/headers</td></tr>
+  </table>
+
+  <h3>Exit Codes</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:13px;margin:0.75rem 0">
+    <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">0</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Scan succeeded, no critical issues</td></tr>
+    <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">1</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Scan succeeded, warnings found</td></tr>
+    <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">2</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Critical/high severity issues or usage error</td></tr>
+  </table>
+
+  <h3>Source</h3>
+  <p style="font-size:13px;color:#8e8e9a"><a href="https://github.com/yokedotlol/xhttp" style="color:#d4a24c">github.com/yokedotlol/xhttp</a> — MIT licensed.</p>
+  </div>
+
+  <div class="prose" style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #1a1520">
+  <h3>API</h3>
+  <p style="font-size:13px;color:#8e8e9a">Prefer curl? The web API returns the same data — no CLI required:</p>
+  </div>
+  <div class="code-block">
+    <span class="kw">$</span> curl -s <span class="str">xhttp.lol/example.com</span> | jq
+  </div>
+  <div class="prose">
+  <p style="font-size:12px;color:#5c5c6b">The API runs analysis server-side. Rate limited to 60 requests/hour. <a href="/api/docs" style="color:#d4a24c">Full API docs →</a></p>
   </div>`;
 }
 
