@@ -36,19 +36,19 @@ var (
 	muted     = lipgloss.Color("#7a7a8e")
 	textColor = lipgloss.Color("#e0e0ea")
 
-	titleStyle = lipgloss.NewStyle().Foreground(amber).Bold(true)
-	gradeA     = lipgloss.NewStyle().Foreground(green).Bold(true)
-	gradeB     = lipgloss.NewStyle().Foreground(blue).Bold(true)
-	gradeC     = lipgloss.NewStyle().Foreground(yellow).Bold(true)
-	gradeD     = lipgloss.NewStyle().Foreground(amber).Bold(true)
-	gradeF     = lipgloss.NewStyle().Foreground(red).Bold(true)
-	okStyle    = lipgloss.NewStyle().Foreground(green)
-	warnStyle  = lipgloss.NewStyle().Foreground(yellow)
-	errStyle   = lipgloss.NewStyle().Foreground(red)
-	infoStyle  = lipgloss.NewStyle().Foreground(blue)
-	dimStyle   = lipgloss.NewStyle().Foreground(dim)
-	mutedStyle = lipgloss.NewStyle().Foreground(muted)
-	labelStyle = lipgloss.NewStyle().Foreground(textColor).Bold(true)
+	titleStyle  = lipgloss.NewStyle().Foreground(amber).Bold(true)
+	gradeA      = lipgloss.NewStyle().Foreground(green).Bold(true)
+	gradeB      = lipgloss.NewStyle().Foreground(blue).Bold(true)
+	gradeC      = lipgloss.NewStyle().Foreground(yellow).Bold(true)
+	gradeD      = lipgloss.NewStyle().Foreground(amber).Bold(true)
+	gradeF      = lipgloss.NewStyle().Foreground(red).Bold(true)
+	okStyle     = lipgloss.NewStyle().Foreground(green)
+	warnStyle   = lipgloss.NewStyle().Foreground(yellow)
+	errStyle    = lipgloss.NewStyle().Foreground(red)
+	infoStyle   = lipgloss.NewStyle().Foreground(blue)
+	dimStyle    = lipgloss.NewStyle().Foreground(dim)
+	mutedStyle  = lipgloss.NewStyle().Foreground(muted)
+	labelStyle  = lipgloss.NewStyle().Foreground(textColor).Bold(true)
 	accentStyle = lipgloss.NewStyle().Foreground(amber)
 )
 
@@ -58,13 +58,13 @@ type Finding struct {
 	Severity string `json:"severity"`
 	Code     string `json:"code"`
 	Message  string `json:"message"`
-	Fix      string `json:"fix"`
-	MDN      string `json:"mdn"`
+	Fix      string `json:"fix,omitempty"`
+	MDN      string `json:"mdn,omitempty"`
 }
 
 type HeaderCheck struct {
 	Present         bool      `json:"present"`
-	Value           *string   `json:"value"`
+	Value           *string   `json:"value,omitempty"`
 	Issues          []Finding `json:"issues"`
 	Recommendation  string    `json:"recommendation,omitempty"`
 	PreloadEligible *bool     `json:"preload_eligible,omitempty"`
@@ -106,7 +106,7 @@ type RedirectHop struct {
 	Status         int               `json:"status"`
 	Location       string            `json:"location,omitempty"`
 	TimingMs       float64           `json:"timing_ms"`
-	HSTSUpgrade    bool              `json:"hsts_upgrade"`
+	HSTSUpgrade    bool              `json:"hsts_upgrade,omitempty"`
 	HeadersSummary map[string]string `json:"headers_summary"`
 }
 
@@ -119,13 +119,14 @@ type RedirectChain struct {
 }
 
 type CacheResult struct {
-	CacheControl string            `json:"cache_control"`
+	CacheControl string                 `json:"cache_control"`
 	Parsed       map[string]interface{} `json:"parsed"`
-	EffectiveTTL *int              `json:"effective_ttl"`
-	Vary         []string          `json:"vary"`
-	CDNStatus    string            `json:"cdn_status"`
-	CDNProvider  string            `json:"cdn_provider"`
-	Issues       []Finding         `json:"issues"`
+	EffectiveTTL *int                   `json:"effective_ttl"`
+	Vary         []string               `json:"vary"`
+	CDNStatus    string                 `json:"cdn_status"`
+	CDNProvider  string                 `json:"cdn_provider"`
+	Issues       []Finding              `json:"issues"`
+	Explanation  string                 `json:"explanation,omitempty"`
 }
 
 type TLSResult struct {
@@ -133,15 +134,17 @@ type TLSResult struct {
 	Details string `json:"details"`
 }
 
+type MetaLinks struct {
+	FullReport string `json:"full_report"`
+	TLSDetails string `json:"tls_details"`
+	DNSDetails string `json:"dns_details"`
+}
+
 type Meta struct {
-	Version    string `json:"version"`
-	ScanTimeMs int    `json:"scan_time_ms"`
-	CacheHit   bool   `json:"cache_hit"`
-	Links      struct {
-		FullReport string `json:"full_report"`
-		TLSDetails string `json:"tls_details"`
-		DNSDetails string `json:"dns_details"`
-	} `json:"links"`
+	Version    string    `json:"version"`
+	ScanTimeMs int       `json:"scan_time_ms"`
+	CacheHit   bool      `json:"cache_hit"`
+	Links      MetaLinks `json:"links"`
 }
 
 type ScanResult struct {
@@ -163,10 +166,6 @@ type CORSSimRequest struct {
 	Method      string   `json:"method,omitempty"`
 	Headers     []string `json:"headers,omitempty"`
 	Credentials bool     `json:"credentials,omitempty"`
-}
-
-type CORSErrorRequest struct {
-	Error string `json:"error"`
 }
 
 // ─── Sub-route wrappers ─────────────────────────────────────────────
@@ -248,6 +247,7 @@ func tree(last bool) string {
 	return dimStyle.Render("├─ ")
 }
 
+// fetchJSON is kept for --api fallback mode.
 func fetchJSON(url string, target interface{}) error {
 	client := &http.Client{Timeout: 90 * time.Second}
 	req, err := http.NewRequest("GET", url, nil)
@@ -274,61 +274,21 @@ func fetchJSON(url string, target interface{}) error {
 	return json.NewDecoder(resp.Body).Decode(target)
 }
 
-func postJSON(url string, body interface{}, target interface{}) error {
-	client := &http.Client{Timeout: 90 * time.Second}
-	data, err := json.Marshal(body)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest("POST", url, strings.NewReader(string(data)))
-	if err != nil {
-		return err
-	}
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", fmt.Sprintf("xhttp-cli/%s", version))
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode == 429 {
-		return fmt.Errorf("rate limited — try again in a minute")
-	}
-	if resp.StatusCode != 200 {
-		respBody, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(respBody))
-	}
-
-	return json.NewDecoder(resp.Body).Decode(target)
-}
-
 // ─── Renderers ──────────────────────────────────────────────────────
 
 func renderBanner(domain string) {
 	fmt.Println()
-	fmt.Printf("  %s — %s\n", titleStyle.Render("xhttp.lol"), labelStyle.Render(domain))
+	fmt.Printf("  %s — %s\n", titleStyle.Render("xhttp"), labelStyle.Render(domain))
 	fmt.Printf("  %s\n\n", dimStyle.Render(strings.Repeat("━", 40)))
 }
 
 func renderGrade(result *ScanResult) {
 	g := result.Grade
 	fmt.Printf("  Grade: %s", gradeStyle(g).Render(g))
-	if result.Meta.CacheHit {
-		fmt.Printf("  %s", dimStyle.Render("(cached)"))
-	}
 	fmt.Printf("  %s\n\n", dimStyle.Render(fmt.Sprintf("[%dms]", result.Meta.ScanTimeMs)))
 }
 
 func renderSecurityHeaders(h SecurityHeaders) {
-	issueCount := 0
-	for _, hc := range h.Headers {
-		issueCount += len(hc.Issues)
-	}
-
 	status := okStyle.Render(fmt.Sprintf("✓ %d/%d", h.Score, h.MaxScore))
 	if h.Score < 50 {
 		status = errStyle.Render(fmt.Sprintf("✗ %d/%d", h.Score, h.MaxScore))
@@ -536,8 +496,8 @@ func renderCache(cache CacheResult) {
 	fmt.Println()
 }
 
-func renderTLS(tls TLSResult) {
-	ver := tls.Version
+func renderTLS(tlsResult TLSResult) {
+	ver := tlsResult.Version
 	if ver == "" || ver == "unknown" {
 		ver = "unknown"
 		fmt.Printf("  %s TLS: %s  %s\n", dimStyle.Render("?"), dimStyle.Render(ver), dimStyle.Render("→ certs.lol for details"))
@@ -576,37 +536,31 @@ func renderFullScan(result *ScanResult) {
 
 func main() {
 	var jsonOutput bool
+	var useAPI bool
 
 	rootCmd := &cobra.Command{
 		Use:   "xhttp <domain>",
 		Short: "HTTP response debugger — CORS, CSP, security headers, redirects, cache",
-		Long: `xhttp.lol CLI — everything the browser sees and enforces.
+		Long: `xhttp CLI — everything the browser sees and enforces.
 
-Scan any domain for CORS behavior, CSP policy, security headers, 
-redirect chains, and cache configuration. One command, full picture.`,
+Scan any domain for CORS behavior, CSP policy, security headers,
+redirect chains, and cache configuration. One command, full picture.
+
+All analysis runs locally — this CLI never contacts xhttp.lol servers.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			domain := strings.TrimSpace(args[0])
-			domain = strings.TrimPrefix(domain, "https://")
-			domain = strings.TrimPrefix(domain, "http://")
-			domain = strings.TrimRight(domain, "/")
+			domain := cleanDomain(args[0])
 
-			if jsonOutput {
-				var raw json.RawMessage
-				if err := fetchJSON(apiBase+"/"+domain, &raw); err != nil {
-					return err
-				}
-				enc := json.NewEncoder(os.Stdout)
-				enc.SetIndent("", "  ")
-				return enc.Encode(raw)
+			if useAPI {
+				return runAPIFullScan(domain, jsonOutput)
 			}
 
 			if isTTY {
 				fmt.Printf("  %s %s...", accentStyle.Render("⏳"), dimStyle.Render("scanning "+domain))
 			}
 
-			var result ScanResult
-			if err := fetchJSON(apiBase+"/"+domain, &result); err != nil {
+			result, err := runLocalScan(domain)
+			if err != nil {
 				if isTTY {
 					fmt.Print("\r\033[K")
 				}
@@ -617,12 +571,19 @@ redirect chains, and cache configuration. One command, full picture.`,
 				fmt.Print("\r\033[K")
 			}
 
-			renderFullScan(&result)
-			return exitCode(&result)
+			if jsonOutput {
+				enc := json.NewEncoder(os.Stdout)
+				enc.SetIndent("", "  ")
+				return enc.Encode(result)
+			}
+
+			renderFullScan(result)
+			return exitCode(result)
 		},
 	}
 
 	rootCmd.PersistentFlags().BoolVar(&jsonOutput, "json", false, "Output raw JSON")
+	rootCmd.PersistentFlags().BoolVar(&useAPI, "api", false, "Use the xhttp.lol API instead of local analysis")
 
 	// ── cors subcommand ───────────────────────────────────────────
 	corsCmd := &cobra.Command{
@@ -631,19 +592,20 @@ redirect chains, and cache configuration. One command, full picture.`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			domain := cleanDomain(args[0])
+
+			if useAPI {
+				return runAPISubScan(domain, "cors", jsonOutput)
+			}
+
+			corsResult := analyzeCORS("https://" + domain)
+			result := SubCORS{URL: "https://" + domain, CORS: corsResult, Meta: buildSubMeta(domain)}
+
 			if jsonOutput {
-				var raw json.RawMessage
-				if err := fetchJSON(apiBase+"/"+domain+"/cors", &raw); err != nil {
-					return err
-				}
 				enc := json.NewEncoder(os.Stdout)
 				enc.SetIndent("", "  ")
-				return enc.Encode(raw)
+				return enc.Encode(result)
 			}
-			var result SubCORS
-			if err := fetchJSON(apiBase+"/"+domain+"/cors", &result); err != nil {
-				return err
-			}
+
 			fmt.Println()
 			fmt.Printf("  %s — %s\n\n", titleStyle.Render("CORS"), labelStyle.Render(domain))
 			renderCORS(result.CORS)
@@ -658,19 +620,21 @@ redirect chains, and cache configuration. One command, full picture.`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			domain := cleanDomain(args[0])
+
+			if useAPI {
+				return runAPISubScan(domain, "headers", jsonOutput)
+			}
+
+			headers := fetchHeadersForDomain("https://" + domain)
+			secResult := analyzeSecurityHeaders(headers)
+			result := SubHeaders{URL: "https://" + domain, SecurityHeaders: secResult, Meta: buildSubMeta(domain)}
+
 			if jsonOutput {
-				var raw json.RawMessage
-				if err := fetchJSON(apiBase+"/"+domain+"/headers", &raw); err != nil {
-					return err
-				}
 				enc := json.NewEncoder(os.Stdout)
 				enc.SetIndent("", "  ")
-				return enc.Encode(raw)
+				return enc.Encode(result)
 			}
-			var result SubHeaders
-			if err := fetchJSON(apiBase+"/"+domain+"/headers", &result); err != nil {
-				return err
-			}
+
 			fmt.Println()
 			fmt.Printf("  %s — %s\n\n", titleStyle.Render("Security Headers"), labelStyle.Render(domain))
 			renderSecurityHeaders(result.SecurityHeaders)
@@ -685,19 +649,26 @@ redirect chains, and cache configuration. One command, full picture.`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			domain := cleanDomain(args[0])
+
+			if useAPI {
+				return runAPISubScan(domain, "csp", jsonOutput)
+			}
+
+			headers := fetchHeadersForDomain("https://" + domain)
+			cspRaw := headers.Get("Content-Security-Policy")
+			allHeadersMap := make(map[string]string)
+			for key := range headers {
+				allHeadersMap[strings.ToLower(key)] = headers.Get(key)
+			}
+			cspResult := evaluateCSPFromHeaders(cspRaw, allHeadersMap)
+			result := SubCSP{URL: "https://" + domain, CSP: cspResult, Meta: buildSubMeta(domain)}
+
 			if jsonOutput {
-				var raw json.RawMessage
-				if err := fetchJSON(apiBase+"/"+domain+"/csp", &raw); err != nil {
-					return err
-				}
 				enc := json.NewEncoder(os.Stdout)
 				enc.SetIndent("", "  ")
-				return enc.Encode(raw)
+				return enc.Encode(result)
 			}
-			var result SubCSP
-			if err := fetchJSON(apiBase+"/"+domain+"/csp", &result); err != nil {
-				return err
-			}
+
 			fmt.Println()
 			fmt.Printf("  %s — %s\n\n", titleStyle.Render("CSP"), labelStyle.Render(domain))
 			renderCSP(result.CSP)
@@ -712,19 +683,20 @@ redirect chains, and cache configuration. One command, full picture.`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			domain := cleanDomain(args[0])
+
+			if useAPI {
+				return runAPISubScan(domain, "chain", jsonOutput)
+			}
+
+			chainResult := followRedirects("https://" + domain)
+			result := SubChain{URL: "https://" + domain, RedirectChain: chainResult, Meta: buildSubMeta(domain)}
+
 			if jsonOutput {
-				var raw json.RawMessage
-				if err := fetchJSON(apiBase+"/"+domain+"/chain", &raw); err != nil {
-					return err
-				}
 				enc := json.NewEncoder(os.Stdout)
 				enc.SetIndent("", "  ")
-				return enc.Encode(raw)
+				return enc.Encode(result)
 			}
-			var result SubChain
-			if err := fetchJSON(apiBase+"/"+domain+"/chain", &result); err != nil {
-				return err
-			}
+
 			fmt.Println()
 			fmt.Printf("  %s — %s\n\n", titleStyle.Render("Redirect Chain"), labelStyle.Render(domain))
 			renderRedirectChain(result.RedirectChain)
@@ -739,38 +711,14 @@ redirect chains, and cache configuration. One command, full picture.`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			domain := cleanDomain(args[0])
-			if jsonOutput {
-				var raw json.RawMessage
-				if err := fetchJSON(apiBase+"/"+domain+"/cache", &raw); err != nil {
-					return err
-				}
-				enc := json.NewEncoder(os.Stdout)
-				enc.SetIndent("", "  ")
-				return enc.Encode(raw)
-			}
-			var result SubCache
-			if err := fetchJSON(apiBase+"/"+domain+"/cache", &result); err != nil {
-				return err
-			}
-			fmt.Println()
-			fmt.Printf("  %s — %s\n\n", titleStyle.Render("Cache"), labelStyle.Render(domain))
-			renderCache(result.Cache)
-			return nil
-		},
-	}
 
-	// ── error subcommand ──────────────────────────────────────────
-	errorCmd := &cobra.Command{
-		Use:   "error <cors-error-message>",
-		Short: "Decode a CORS error from your browser console",
-		Args:  cobra.MinimumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			errorMsg := strings.Join(args, " ")
-
-			var result map[string]interface{}
-			if err := postJSON(apiBase+"/error", CORSErrorRequest{Error: errorMsg}, &result); err != nil {
-				return err
+			if useAPI {
+				return runAPISubScan(domain, "cache", jsonOutput)
 			}
+
+			headers := fetchHeadersForDomain("https://" + domain)
+			cacheResult := analyzeCacheBehavior(headers)
+			result := SubCache{URL: "https://" + domain, Cache: cacheResult, Meta: buildSubMeta(domain)}
 
 			if jsonOutput {
 				enc := json.NewEncoder(os.Stdout)
@@ -779,38 +727,33 @@ redirect chains, and cache configuration. One command, full picture.`,
 			}
 
 			fmt.Println()
-			fmt.Printf("  %s\n\n", titleStyle.Render("CORS Error Decoded"))
-
-			if diag, ok := result["diagnosis"].(string); ok {
-				fmt.Printf("  %s %s\n\n", labelStyle.Render("Diagnosis:"), diag)
-			}
-			if cause, ok := result["likely_cause"].(string); ok {
-				fmt.Printf("  %s %s\n\n", labelStyle.Render("Likely cause:"), cause)
-			}
-			if steps, ok := result["fix_steps"].([]interface{}); ok && len(steps) > 0 {
-				fmt.Printf("  %s\n", labelStyle.Render("Fix:"))
-				for i, s := range steps {
-					fmt.Printf("  %s%s\n", tree(i == len(steps)-1), s)
-				}
-				fmt.Println()
-			}
-			if headers, ok := result["headers_needed"].(map[string]interface{}); ok && len(headers) > 0 {
-				fmt.Printf("  %s\n", labelStyle.Render("Headers needed:"))
-				keys := make([]string, 0, len(headers))
-				for k := range headers {
-					keys = append(keys, k)
-				}
-				sort.Strings(keys)
-				for i, k := range keys {
-					fmt.Printf("  %s%s: %v\n", tree(i == len(keys)-1), accentStyle.Render(k), headers[k])
-				}
-				fmt.Println()
-			}
+			fmt.Printf("  %s — %s\n\n", titleStyle.Render("Cache"), labelStyle.Render(domain))
+			renderCache(result.Cache)
 			return nil
 		},
 	}
 
-	// ── simulate subcommand ───────────────────────────────────────
+	// ── error subcommand (fully local — no network needed) ────────
+	errorCmd := &cobra.Command{
+		Use:   "error <cors-error-message>",
+		Short: "Decode a CORS error from your browser console",
+		Args:  cobra.MinimumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			errorMsg := strings.Join(args, " ")
+			result := decodeCORSError(errorMsg)
+
+			if jsonOutput {
+				enc := json.NewEncoder(os.Stdout)
+				enc.SetIndent("", "  ")
+				return enc.Encode(result)
+			}
+
+			renderCORSErrorResult(result)
+			return nil
+		},
+	}
+
+	// ── simulate subcommand (local — makes HTTP requests from your machine) ──
 	var simOrigin, simMethod string
 	var simHeaders []string
 	var simCredentials bool
@@ -833,10 +776,7 @@ redirect chains, and cache configuration. One command, full picture.`,
 				Credentials: simCredentials,
 			}
 
-			var result map[string]interface{}
-			if err := postJSON(apiBase+"/cors", req, &result); err != nil {
-				return err
-			}
+			result := simulateCORS(req)
 
 			if jsonOutput {
 				enc := json.NewEncoder(os.Stdout)
@@ -848,31 +788,27 @@ redirect chains, and cache configuration. One command, full picture.`,
 			fmt.Printf("  %s\n", titleStyle.Render("CORS Simulation"))
 			fmt.Printf("  %s → %s\n\n", accentStyle.Render(simOrigin), labelStyle.Render(target))
 
-			if allowed, ok := result["allowed"].(bool); ok {
-				if allowed {
-					fmt.Printf("  Result: %s\n\n", okStyle.Render("✓ ALLOWED"))
-				} else {
-					fmt.Printf("  Result: %s\n\n", errStyle.Render("✗ BLOCKED"))
-				}
+			if result.Allowed {
+				fmt.Printf("  Result: %s\n\n", okStyle.Render("✓ ALLOWED"))
+			} else {
+				fmt.Printf("  Result: %s\n\n", errStyle.Render("✗ BLOCKED"))
 			}
 
-			if reason, ok := result["reason"].(string); ok && reason != "" {
-				fmt.Printf("  %s\n\n", reason)
+			if result.Reason != "" {
+				fmt.Printf("  %s\n\n", result.Reason)
 			}
 
-			if fix, ok := result["fix"].(map[string]interface{}); ok {
-				if explanation, ok := fix["explanation"].(string); ok {
-					fmt.Printf("  %s %s\n\n", labelStyle.Render("Fix:"), explanation)
-				}
-				if headers, ok := fix["headers"].(map[string]interface{}); ok {
+			if result.Fix != nil {
+				fmt.Printf("  %s %s\n\n", labelStyle.Render("Fix:"), result.Fix.Explanation)
+				if len(result.Fix.Headers) > 0 {
 					fmt.Printf("  %s\n", labelStyle.Render("Headers:"))
-					keys := make([]string, 0, len(headers))
-					for k := range headers {
+					keys := make([]string, 0, len(result.Fix.Headers))
+					for k := range result.Fix.Headers {
 						keys = append(keys, k)
 					}
 					sort.Strings(keys)
 					for i, k := range keys {
-						fmt.Printf("  %s%s: %v\n", tree(i == len(keys)-1), accentStyle.Render(k), headers[k])
+						fmt.Printf("  %s%s: %v\n", tree(i == len(keys)-1), accentStyle.Render(k), result.Fix.Headers[k])
 					}
 					fmt.Println()
 				}
@@ -966,4 +902,102 @@ type exitErr struct {
 
 func (e *exitErr) Error() string {
 	return ""
+}
+
+// ─── API fallback helpers ───────────────────────────────────────────
+
+func runAPIFullScan(domain string, jsonOutput bool) error {
+	if isTTY {
+		fmt.Printf("  %s %s...", accentStyle.Render("⏳"), dimStyle.Render("scanning "+domain+" (via API)"))
+	}
+
+	if jsonOutput {
+		var raw json.RawMessage
+		if err := fetchJSON(apiBase+"/"+domain, &raw); err != nil {
+			if isTTY {
+				fmt.Print("\r\033[K")
+			}
+			return err
+		}
+		if isTTY {
+			fmt.Print("\r\033[K")
+		}
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(raw)
+	}
+
+	var result ScanResult
+	if err := fetchJSON(apiBase+"/"+domain, &result); err != nil {
+		if isTTY {
+			fmt.Print("\r\033[K")
+		}
+		return err
+	}
+
+	if isTTY {
+		fmt.Print("\r\033[K")
+	}
+
+	renderFullScan(&result)
+	return exitCode(&result)
+}
+
+func runAPISubScan(domain, subRoute string, jsonOutput bool) error {
+	url := apiBase + "/" + domain + "/" + subRoute
+
+	if jsonOutput {
+		var raw json.RawMessage
+		if err := fetchJSON(url, &raw); err != nil {
+			return err
+		}
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(raw)
+	}
+
+	switch subRoute {
+	case "cors":
+		var result SubCORS
+		if err := fetchJSON(url, &result); err != nil {
+			return err
+		}
+		fmt.Println()
+		fmt.Printf("  %s — %s\n\n", titleStyle.Render("CORS"), labelStyle.Render(domain))
+		renderCORS(result.CORS)
+	case "headers":
+		var result SubHeaders
+		if err := fetchJSON(url, &result); err != nil {
+			return err
+		}
+		fmt.Println()
+		fmt.Printf("  %s — %s\n\n", titleStyle.Render("Security Headers"), labelStyle.Render(domain))
+		renderSecurityHeaders(result.SecurityHeaders)
+	case "csp":
+		var result SubCSP
+		if err := fetchJSON(url, &result); err != nil {
+			return err
+		}
+		fmt.Println()
+		fmt.Printf("  %s — %s\n\n", titleStyle.Render("CSP"), labelStyle.Render(domain))
+		renderCSP(result.CSP)
+	case "chain":
+		var result SubChain
+		if err := fetchJSON(url, &result); err != nil {
+			return err
+		}
+		fmt.Println()
+		fmt.Printf("  %s — %s\n\n", titleStyle.Render("Redirect Chain"), labelStyle.Render(domain))
+		renderRedirectChain(result.RedirectChain)
+	case "cache":
+		var result SubCache
+		if err := fetchJSON(url, &result); err != nil {
+			return err
+		}
+		fmt.Println()
+		fmt.Printf("  %s — %s\n\n", titleStyle.Render("Cache"), labelStyle.Render(domain))
+		renderCache(result.Cache)
+	}
+
+	return nil
 }
