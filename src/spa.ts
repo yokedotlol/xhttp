@@ -171,11 +171,6 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 .hero-text{margin:2.5rem 0 1rem;color:var(--text-secondary);font-size:14px;line-height:1.8;max-width:560px}
 .hero-text strong{color:var(--text);font-weight:600}
 
-.features{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:1.5rem 0}
-.feature{padding:16px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border)}
-.feature-icon{font-size:20px;margin-bottom:8px}
-.feature-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
-.feature-desc{font-size:12px;color:var(--text-secondary);line-height:1.5}
 
 .code-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;font-family:var(--font-mono);font-size:12px;overflow-x:auto;color:var(--text);margin:12px 0;line-height:1.6}
 .code-block .kw{color:var(--accent)}.code-block .str{color:var(--ok)}.code-block .cmt{color:var(--dim)}
@@ -203,7 +198,7 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 .loading{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-@media(max-width:640px){.features{grid-template-columns:1fr}.grade-hero{flex-direction:column;align-items:flex-start;gap:12px}.grade-letter{font-size:48px}}
+@media(max-width:640px){.grade-hero{flex-direction:column;align-items:flex-start;gap:12px}.grade-letter{font-size:48px}}
 .prose{font-size:14px;color:var(--text-secondary);line-height:1.8;max-width:560px;margin:1.5rem 0}
 .prose h2{color:var(--text);font-size:16px;font-weight:700;margin:2rem 0 0.5rem}
 .prose h3{color:var(--text);font-size:14px;font-weight:600;margin:1.5rem 0 0.5rem}
@@ -283,38 +278,6 @@ function landingPage(): string {
   return `
   <div class="hero-text">
     <strong>Debug HTTP responses in seconds.</strong> CORS policies, CSP directives, security headers, redirect chains, cache behavior — analyzed, graded, and explained. Just type a domain above.
-  </div>
-  <div class="features">
-    <div class="feature">
-      <div class="feature-icon">🔀</div>
-      <div class="feature-title">CORS Analysis</div>
-      <div class="feature-desc">Preflight simulation, origin reflection detection, wildcard+credentials checks, fix suggestions with server configs.</div>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">🛡️</div>
-      <div class="feature-title">CSP Evaluation</div>
-      <div class="feature-desc">Directive parsing, bypass detection, unsafe-inline/eval checks, missing directive warnings. A–F grading.</div>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">🔒</div>
-      <div class="feature-title">Security Headers</div>
-      <div class="feature-desc">HSTS, XFO, XCTO, Referrer-Policy, Permissions-Policy, COOP, COEP. Preload eligibility check.</div>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">↗️</div>
-      <div class="feature-title">Redirect Chain</div>
-      <div class="feature-desc">Follow up to 20 hops with per-hop timing. Detect loops, mixed-content downgrades, unnecessary redirects.</div>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">💾</div>
-      <div class="feature-title">Cache Behavior</div>
-      <div class="feature-desc">Cache-Control parsing, effective TTL, Vary implications, CDN detection from response headers.</div>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">🔧</div>
-      <div class="feature-title">Error Decoder</div>
-      <div class="feature-desc">Paste a CORS error from your browser console. Get the diagnosis, the fix, and the headers you need.</div>
-    </div>
   </div>
   <div class="code-block">
     <span class="cmt"># Full scan</span><br>
