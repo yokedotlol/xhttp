@@ -557,7 +557,7 @@ function cliPage(): string {
     <span style="display:inline-block;background:#1a1520;border:1px solid #2a2030;border-radius:4px;padding:2px 8px;font-size:12px;color:#d4a24c">Go</span>
     <span style="display:inline-block;background:#1a1520;border:1px solid #2a2030;border-radius:4px;padding:2px 8px;font-size:12px;color:#d4a24c">Zero dependencies</span>
   </p>
-  <p style="margin-top:0.75rem;padding:8px 12px;background:#111116;border-left:3px solid #3fb950;border-radius:4px;font-size:12px;color:#8e8e9a">🔒 <strong style="color:#3fb950">Privacy:</strong> This CLI never contacts xhttp.lol servers. All analysis runs directly from your machine to the target domain. No data leaves your network. <a href="https://github.com/yokedotlol/xhttp" style="color:#d4a24c">You can always self-host if you need privacy.</a></p>
+  <p style="margin-top:0.75rem;padding:8px 12px;background:#111116;border-left:3px solid #3fb950;border-radius:4px;font-size:12px;color:#8e8e9a">🔒 <strong style="color:#3fb950">Privacy:</strong> By default, this CLI never contacts xhttp.lol servers. All analysis runs directly from your machine to the target domain. The <code style="color:#d4a24c">--api</code> flag optionally routes requests through xhttp.lol for comparison. <a href="https://github.com/yokedotlol/xhttp" style="color:#d4a24c">You can always self-host if you need privacy.</a></p>
   </div>
 
   <div class="prose">
@@ -608,6 +608,12 @@ function cliPage(): string {
     <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">xhttp cache &lt;domain&gt;</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Cache-Control, CDN detection, TTL</td></tr>
     <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">xhttp error &lt;msg&gt;</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Decode a browser CORS error → diagnosis + fix</td></tr>
     <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">xhttp simulate &lt;url&gt;</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Simulate CORS with custom origin/method/headers</td></tr>
+  </table>
+
+  <h3>Flags</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:13px;margin:0.75rem 0">
+    <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">--json</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Output raw JSON</td></tr>
+    <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">--api</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Route requests through xhttp.lol API instead of local analysis</td></tr>
   </table>
 
   <h3>Exit Codes</h3>
