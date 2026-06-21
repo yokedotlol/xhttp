@@ -70,6 +70,7 @@ Part of the [.lol developer tools](https://yoke.lol) family:
 - **[certs.lol](https://certs.lol)** — TLS/SSL certificate analysis
 - **[ns.lol](https://ns.lol)** — DNS toolkit
 - **[xhttp.lol](https://xhttp.lol)** — HTTP response debugger
+- **[vrfy.lol](https://vrfy.lol)** — Email validation
 
 ## License
 
