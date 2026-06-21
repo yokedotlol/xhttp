@@ -546,7 +546,7 @@ func main() {
 Scan any domain for CORS behavior, CSP policy, security headers,
 redirect chains, and cache configuration. One command, full picture.
 
-All analysis runs locally — this CLI never contacts xhttp.lol servers.`,
+By default, all analysis runs locally. Use --api to query xhttp.lol instead.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			domain := cleanDomain(args[0])
