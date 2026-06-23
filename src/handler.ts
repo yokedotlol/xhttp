@@ -82,6 +82,26 @@ export async function handleRequest(request: Request, env: Env, ctx: ExecutionCo
   if (path === '/og.png') return new Response(ogImagePng(), { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=604800' } });
   if (path === '/apple-touch-icon.png') return new Response(touchIconPng(), { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=604800' } });
   if (path === '/.well-known/mta-sts.txt') return new Response(mtaSts(), { headers: { 'Content-Type': 'text/plain' } });
+  if (path === '/.well-known/ai-catalog.json') {
+    const catalog = {
+      specVersion: "1.0",
+      host: { displayName: "xhttp.lol", identifier: "did:web:xhttp.lol", documentationUrl: "https://xhttp.lol/api/docs" },
+      entries: [{
+        identifier: "urn:air:xhttp.lol:api:http-analysis",
+        displayName: "xhttp.lol HTTP Header Analysis API",
+        type: "application/openapi+json",
+        url: "https://xhttp.lol/api/docs",
+        description: "Free HTTP security header analysis API — CORS, CSP, cache, redirects, error decoding. Scans real response headers. No auth required.",
+        representativeQueries: [
+          "analyze HTTP security headers for a domain",
+          "check CORS configuration for an API endpoint",
+          "evaluate Content Security Policy for a website",
+          "trace redirect chain for a URL",
+        ],
+      }],
+    };
+    return new Response(JSON.stringify(catalog, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=86400' } });
+  }
   if (path === '/install.sh') return Response.redirect('https://raw.githubusercontent.com/yokedotlol/xhttp/main/cli/install.sh', 302);
   if (path === '/usage' && request.headers.get('Authorization') === `Bearer ${env.ADMIN_KEY}`) return handleUsage(env);
 
