@@ -76,6 +76,8 @@ export async function handleRequest(request: Request, env: Env, ctx: ExecutionCo
   if (path === '/sitemap.xml') return new Response(sitemapXml(), { headers: { 'Content-Type': 'application/xml' } });
   if (path === '/security.txt' || path === '/.well-known/security.txt') return new Response(securityTxt(), { headers: { 'Content-Type': 'text/plain' } });
   if (path === '/llms.txt') return new Response(llmsTxt(), { headers: { 'Content-Type': 'text/plain' } });
+  if (path === '/bimi-logo.svg') return new Response(bimiSvg(), { headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=604800' } });
+  if (path === '/favicon.ico') return new Response(faviconSvg(), { headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=604800' } });
   if (path === '/favicon.svg') return new Response(faviconSvg(), { headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=604800' } });
   if (path === '/.well-known/mta-sts.txt') return new Response(mtaSts(), { headers: { 'Content-Type': 'text/plain' } });
   if (path === '/install.sh') return Response.redirect('https://raw.githubusercontent.com/yokedotlol/xhttp/main/cli/install.sh', 302);
@@ -467,7 +469,27 @@ https://github.com/yokedotlol/xhttp (MIT)
 }
 
 function faviconSvg(): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🛡️</text></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="6" fill="#08080c"/>
+  <text x="16" y="24" font-family="monospace" font-weight="500" font-size="22"
+        fill="#fae4c4" text-anchor="middle">x</text>
+</svg>`;
+}
+
+function bimiSvg(): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny-ps"
+     viewBox="0 0 512 512" width="512" height="512">
+  <title>xhttp BIMI Logo</title>
+  <rect width="512" height="512" fill="#0a0a0f"/>
+  <text x="175" y="330" font-family="monospace" font-weight="500" font-size="280"
+        fill="#f0a83c" opacity="0.15">x</text>
+  <text x="175" y="330" font-family="monospace" font-weight="500" font-size="280"
+        fill="#f0a83c" opacity="0.25">x</text>
+  <text x="175" y="330" font-family="monospace" font-weight="500" font-size="280"
+        fill="#fae4c4">x</text>
+  <rect x="310" y="135" width="80" height="200" rx="2" fill="#f0a83c"/>
+</svg>`;
 }
 
 function mtaSts(): string {
