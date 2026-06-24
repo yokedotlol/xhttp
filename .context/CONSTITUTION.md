@@ -62,6 +62,6 @@ Same model as the .lol family — CF Workers $5/mo Paid plan.
 - KV writes: $5.00/M (cache results per domain)
 - DO requests: $0.15/M (rate limiting)
 
-## .ai/ Maintenance Protocol
+## .context/ Maintenance Protocol
 
 Same as the family: CONSTITUTION changes are rare and require discussion. DECISIONS is append-only. INVARIANTS require explicit approval to add/remove.
