@@ -82,21 +82,21 @@ export async function handleRequest(request: Request, env: Env, ctx: ExecutionCo
   // ── Static routes ──────────────────────────────────────────────
   if (path === '/health') return jsonResponse({ status: 'ok', version: VERSION });
   if (path === '/robots.txt') return new Response(robotsTxt(), { headers: { 'Content-Type': 'text/plain' } });
-  if (path === '/sitemap.xml') return new Response(sitemapXml(), { headers: { 'Content-Type': 'application/xml' } });
-  if (path === '/security.txt' || path === '/.well-known/security.txt') return new Response(securityTxt(), { headers: { 'Content-Type': 'text/plain' } });
-  if (path === '/llms.txt') return new Response(llmsTxt(), { headers: { 'Content-Type': 'text/plain' } });
-  if (path === '/bimi-logo.svg') return new Response(bimiSvg(), { headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=604800' } });
+  if (path === '/sitemap.xml') return new Response(sitemapXml(), { headers: { 'Content-Type': 'application/xml', ...SECURITY_HEADERS } });
+  if (path === '/security.txt' || path === '/.well-known/security.txt') return new Response(securityTxt(), { headers: { 'Content-Type': 'text/plain', ...SECURITY_HEADERS } });
+  if (path === '/llms.txt') return new Response(llmsTxt(), { headers: { 'Content-Type': 'text/plain', ...SECURITY_HEADERS } });
+  if (path === '/bimi-logo.svg') return new Response(bimiSvg(), { headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=604800', ...SECURITY_HEADERS } });
   if (path === '/favicon.ico') {
     const binary = Uint8Array.from(atob(FAVICON_ICO_B64), c => c.charCodeAt(0));
-    return new Response(binary, { headers: { 'Content-Type': 'image/vnd.microsoft.icon', 'Cache-Control': 'public, max-age=604800' } });
+    return new Response(binary, { headers: { 'Content-Type': 'image/vnd.microsoft.icon', 'Cache-Control': 'public, max-age=604800', ...SECURITY_HEADERS } });
   }
-  if (path === '/favicon.svg') return new Response(faviconSvg(), { headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=604800' } });
-  if (path === '/og.png') return new Response(ogImagePng(), { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=604800' } });
-  if (path === '/apple-touch-icon.png') return new Response(touchIconPng(), { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=604800' } });
-  if (path === '/icon-192.png') return new Response(icon192Png(), { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=604800' } });
-  if (path === '/icon-512.png') return new Response(icon512Png(), { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=604800' } });
-  if (path === '/manifest.json') return new Response(JSON.stringify({ name: "xhttp.lol", short_name: "xhttp", icons: [{ src: "/icon-192.png", sizes: "192x192", type: "image/png" }, { src: "/icon-512.png", sizes: "512x512", type: "image/png" }], display: "standalone", background_color: "#0a0a0f", theme_color: "#f0a83c" }), { headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=86400' } });
-  if (path === '/.well-known/mta-sts.txt') return new Response(mtaSts(), { headers: { 'Content-Type': 'text/plain' } });
+  if (path === '/favicon.svg') return new Response(faviconSvg(), { headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=604800', ...SECURITY_HEADERS } });
+  if (path === '/og.png') return new Response(ogImagePng(), { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=604800', ...SECURITY_HEADERS } });
+  if (path === '/apple-touch-icon.png') return new Response(touchIconPng(), { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=604800', ...SECURITY_HEADERS } });
+  if (path === '/icon-192.png') return new Response(icon192Png(), { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=604800', ...SECURITY_HEADERS } });
+  if (path === '/icon-512.png') return new Response(icon512Png(), { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=604800', ...SECURITY_HEADERS } });
+  if (path === '/manifest.json') return new Response(JSON.stringify({ name: "xhttp.lol", short_name: "xhttp", icons: [{ src: "/icon-192.png", sizes: "192x192", type: "image/png" }, { src: "/icon-512.png", sizes: "512x512", type: "image/png" }], display: "standalone", background_color: "#0a0a0f", theme_color: "#f0a83c" }), { headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=86400', ...SECURITY_HEADERS } });
+  if (path === '/.well-known/mta-sts.txt') return new Response(mtaSts(), { headers: { 'Content-Type': 'text/plain', ...SECURITY_HEADERS } });
   if (path === '/.well-known/ai-catalog.json') {
     const catalog = {
       specVersion: "1.0",
