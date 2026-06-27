@@ -49,6 +49,15 @@ function jsonResponse(data: unknown, status = 200, extra?: Record<string, string
   return new Response(JSON.stringify(data, null, 2), { status, headers });
 }
 
+function wantsJSON(request: Request): boolean {
+  const accept = request.headers.get('Accept') || '';
+  const ua = request.headers.get('User-Agent') || '';
+  if (accept.includes('application/json')) return true;
+  if (accept.includes('text/html')) return false;
+  if (/^(curl|HTTPie|Wget|fetch|node|python|Go-http|axios)/i.test(ua)) return true;
+  return false;
+}
+
 function isIP(s: string): boolean {
   return /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(s) || s.includes(':');
 }
@@ -127,6 +136,23 @@ export async function handleRequest(request: Request, env: Env, ctx: ExecutionCo
 
   // Landing page
   if (path === '/' || path === '/about' || path === '/privacy' || path === '/terms' || path === '/cli' || path === '/api/docs') {
+    // curl-first: return JSON for CLI tools hitting the root
+    if (path === '/' && wantsJSON(request)) {
+      return jsonResponse({
+        name: 'xhttp.lol',
+        tagline: 'The HTTP response debugger.',
+        usage: 'curl -s https://xhttp.lol/example.com | jq',
+        docs: 'https://xhttp.lol/api/docs',
+        version: VERSION,
+        family: {
+          http: 'https://xhttp.lol',
+          tls: 'https://certs.lol',
+          dns: 'https://ns.lol',
+          email: 'https://vrfy.lol',
+          domains: 'https://yoke.lol',
+        },
+      });
+    }
     const nonce = crypto.randomUUID();
     const { html } = await import('./spa');
     return new Response(html(path, nonce), {

@@ -54,6 +54,7 @@ export function html(path: string, nonce: string, data?: Partial<ScanResult>): s
     applicationCategory: 'SecurityApplication',
     operatingSystem: 'Any',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    author: { '@type': 'Organization', name: 'Yoke', url: 'https://yoke.lol' },
   })}</script>
 ${styles()}
 </head>
