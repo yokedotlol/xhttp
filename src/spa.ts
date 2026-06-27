@@ -315,9 +315,7 @@ function resultPage(data: ScanResult): string {
   </div>
 
   <div class="links-row">
-    <a class="link-pill" href="${esc(data._meta?.links?.full_report || '#')}">📊 Full report → yoke.lol</a>
-    <a class="link-pill" href="${esc(data._meta?.links?.tls_details || '#')}">🔐 TLS → certs.lol</a>
-    <a class="link-pill" href="${esc(data._meta?.links?.dns_details || '#')}">🌐 DNS → ns.lol</a>
+    <a class="link-pill" href="${esc(data._meta?.links?.full_report || '#')}">📊 Full domain report → yoke.lol</a>
   </div>
 
   ${renderSecurityHeaders(data.security_headers)}
@@ -676,6 +674,6 @@ function apiDocsPage(): string {
   <p>Evaluate a CSP string. Body: <code>{"policy":"default-src 'self'; script-src …"}</code></p>
 
   <h3>Response format</h3>
-  <p>All domain scan responses include <code>_meta.links</code> pointing to <a href="https://yoke.lol">yoke.lol</a> (full report), <a href="https://certs.lol">certs.lol</a> (TLS), and <a href="https://ns.lol">ns.lol</a> (DNS) for deeper analysis.</p>
+  <p>All domain scan responses include <code>_meta.links</code> pointing to <a href="https://yoke.lol">yoke.lol</a> for deeper analysis — full report, TLS details, and DNS details all link to the comprehensive domain intelligence dashboard.</p>
   </div>`;
 }
