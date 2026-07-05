@@ -311,8 +311,8 @@ async function runScan(domain: string, _subRoute: string | null, env: Env): Prom
       cache_hit: false,
       links: {
         full_report: `https://yoke.lol/${domain}`,
-        tls_details: `https://yoke.lol/${domain}`,
-        dns_details: `https://yoke.lol/${domain}`,
+        tls_details: `https://certs.lol/${domain}`,
+        dns_details: `https://ns.lol/${domain}`,
         email_validation: 'https://vrfy.lol',
       },
     },
