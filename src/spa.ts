@@ -261,12 +261,12 @@ function scripts(nonce: string): string {
 function footer(): string {
   return `<footer class="footer">
   <div class="footer-links">
-    <a href="https://github.com/yokedotlol/xhttp">GitHub</a>
-    <a href="/api/docs">API</a>
-    <a href="/cli">CLI</a>
-    <a href="/about">About</a>
-    <a href="/privacy">Privacy</a>
-    <a href="/terms">Terms</a>
+    <a href="https://github.com/yokedotlol/xhttp">github</a>
+    <a href="/api/docs">api</a>
+    <a href="/cli">cli</a>
+    <a href="/about">about</a>
+    <a href="/privacy">privacy</a>
+    <a href="/terms">terms</a>
   </div>
   <div class="footer-tagline">Part of the <a href="https://yoke.lol/tools">.lol tools</a></div>
   <div class="footer-family">
