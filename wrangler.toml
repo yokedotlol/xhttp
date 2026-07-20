@@ -47,3 +47,7 @@ new_classes = ["RateLimiterV2DO"]
 [[services]]
 binding = "YOKE"
 service = "yoke"
+
+[[migrations]]
+tag = "v3"
+deleted_classes = ["RateLimiterDO"]

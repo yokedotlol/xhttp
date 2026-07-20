@@ -1,6 +1,6 @@
 import { handleRequest } from './handler';
 
-export { RateLimiterV2DO, RateLimiterV2DO as RateLimiterDO } from './rate-limiter';
+export { RateLimiterV2DO } from './rate-limiter';
 
 export interface Env {
   CACHE: KVNamespace;
