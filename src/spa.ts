@@ -536,7 +536,7 @@ function privacyPage(): string {
   return `<div class="prose">
   <h2>Privacy</h2>
   <p>xhttp.lol does not track you. No cookies, no analytics, no advertising, no account required.</p>
-  <p>We log scan counts per day (no domain names, no IPs) for capacity planning. Rate limiting uses your IP address in a Durable Object that expires after one hour.</p>
+  <p>We log scan counts per day (no domain names, no IPs) for capacity planning. Rate limiting uses an IP-derived hashed key in a Cloudflare Durable Object that expires after one hour.</p>
   <p>Scan results are cached for one hour in Cloudflare KV, keyed by domain name. No personal data is stored.</p>
   <p><a href="mailto:hello@yoke.lol">hello@yoke.lol</a> for questions.</p>
   </div>`;

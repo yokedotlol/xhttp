@@ -433,9 +433,20 @@ async function handleCSPEvaluate(request: Request): Promise<Response> {
 
 // ── Rate limiting ────────────────────────────────────────────────
 
+async function hashRateLimitKey(ip: string, env: Env): Promise<string> {
+  const salt = env.IP_HASH_SALT || 'xhttp-default-salt';
+  const data = new TextEncoder().encode(`${ip}:${salt}`);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, 16);
+}
+
 async function checkRateLimit(request: Request, env: Env): Promise<Response | null> {
   const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-  const id = env.RATE_LIMITER.idFromName(ip);
+  const key = await hashRateLimitKey(ip, env);
+  const id = env.RATE_LIMITER.idFromName(key);
   const stub = env.RATE_LIMITER.get(id);
 
   try {
@@ -443,19 +454,20 @@ async function checkRateLimit(request: Request, env: Env): Promise<Response | nu
       method: 'POST',
       body: JSON.stringify({ limit: RATE_LIMIT, window: 3600 }),
     }));
-    const data = await resp.json() as { allowed: boolean; remaining: number; reset: number };
+    const data = await resp.json() as { allowed: boolean; remaining: number; retryAfter?: number };
     if (!data.allowed) {
-      const retryMin = Math.ceil(data.reset / 60);
+      const retryAfter = data.retryAfter || 3600;
+      const retryMin = Math.ceil(retryAfter / 60);
       return jsonResponse(
         {
           error: 'Rate limit exceeded',
           limit: RATE_LIMIT,
           window: '1 hour',
-          retry_after_seconds: data.reset,
+          retry_after_seconds: retryAfter,
           message: `Rate limited. Try again in ~${retryMin} minute${retryMin === 1 ? '' : 's'}. Install the CLI for unlimited local scans.`,
         },
         429,
-        { 'Retry-After': String(data.reset) }
+        { 'Retry-After': String(retryAfter) }
       );
     }
   } catch {
