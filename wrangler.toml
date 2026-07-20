@@ -24,11 +24,16 @@ zone_name = "xhttp.lol"
 
 [[durable_objects.bindings]]
 name = "RATE_LIMITER"
-class_name = "RateLimiterDO"
+class_name = "RateLimiterV2DO"
 
 [[migrations]]
 tag = "v1"
 new_classes = ["RateLimiterDO"]
+
+[[migrations]]
+tag = "v2"
+deleted_classes = ["RateLimiterDO"]
+new_classes = ["RateLimiterV2DO"]
 
 # Secrets (set via wrangler secret put):
 # ADMIN_KEY - shared probe auth key
