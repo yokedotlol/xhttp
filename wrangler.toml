@@ -32,7 +32,6 @@ new_classes = ["RateLimiterDO"]
 
 [[migrations]]
 tag = "v2"
-deleted_classes = ["RateLimiterDO"]
 new_classes = ["RateLimiterV2DO"]
 
 # Secrets (set via wrangler secret put):
