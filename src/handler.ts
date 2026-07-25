@@ -579,7 +579,7 @@ function faviconSvg(): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <rect width="32" height="32" rx="6" fill="#08080c"/>
   <text x="16" y="24" font-family="monospace" font-weight="500" font-size="22"
-        fill="#fae4c4" text-anchor="middle">x</text>
+        fill="#f0a83c" text-anchor="middle">x</text>
 </svg>`;
 }
 
