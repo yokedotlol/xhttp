@@ -198,9 +198,9 @@ export async function handleRequest(request: Request, env: Env, ctx: ExecutionCo
     if (subRoute) {
       const filtered = filterResult(cached as ScanResult, subRoute);
       if (!filtered) return jsonResponse({ error: `Unknown sub-route: ${subRoute}` }, 400);
-      return jsonResponse(filtered, 200, rateLimitHeaders(request, env));
+      return jsonResponse(filtered, 200, await rateLimitHeaders(request, env));
     }
-    return jsonResponse(cached, 200, rateLimitHeaders(request, env));
+    return jsonResponse(cached, 200, await rateLimitHeaders(request, env));
   }
 
   // Rate limit — only fresh scans count
@@ -231,10 +231,10 @@ export async function handleRequest(request: Request, env: Env, ctx: ExecutionCo
   if (subRoute && result) {
     const filtered = filterResult(result as ScanResult, subRoute);
     if (!filtered) return jsonResponse({ error: `Unknown sub-route: ${subRoute}` }, 400);
-    return jsonResponse(filtered, 200, rateLimitHeaders(request, env));
+    return jsonResponse(filtered, 200, await rateLimitHeaders(request, env));
   }
 
-  return jsonResponse(result, 200, rateLimitHeaders(request, env));
+  return jsonResponse(result, 200, await rateLimitHeaders(request, env));
 }
 
 async function runScan(domain: string, _subRoute: string | null, env: Env): Promise<ScanResult> {
@@ -454,7 +454,7 @@ async function checkRateLimit(request: Request, env: Env): Promise<Response | nu
       method: 'POST',
       body: JSON.stringify({ limit: RATE_LIMIT, window: 3600 }),
     }));
-    const data = await resp.json() as { allowed: boolean; remaining: number; retryAfter?: number };
+    const data = await resp.json() as { allowed: boolean; remaining: number; retryAfter?: number; reset?: number };
     if (!data.allowed) {
       const retryAfter = data.retryAfter || 3600;
       const retryMin = Math.ceil(retryAfter / 60);
@@ -467,7 +467,12 @@ async function checkRateLimit(request: Request, env: Env): Promise<Response | nu
           message: `Rate limited. Try again in ~${retryMin} minute${retryMin === 1 ? '' : 's'}. Install the CLI for unlimited local scans.`,
         },
         429,
-        { 'Retry-After': String(retryAfter) }
+        {
+          'Retry-After': String(retryAfter),
+          'X-RateLimit-Limit': String(RATE_LIMIT),
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': String(data.reset ?? retryAfter),
+        }
       );
     }
   } catch {
@@ -476,9 +481,25 @@ async function checkRateLimit(request: Request, env: Env): Promise<Response | nu
   return null;
 }
 
-function rateLimitHeaders(_request: Request, _env: Env): Record<string, string> {
-  // Placeholder — populated from DO response in a real implementation
-  return {};
+async function rateLimitHeaders(request: Request, env: Env): Promise<Record<string, string>> {
+  try {
+    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+    const key = await hashRateLimitKey(ip, env);
+    const id = env.RATE_LIMITER.idFromName(key);
+    const stub = env.RATE_LIMITER.get(id);
+    const resp = await stub.fetch(new Request('https://rl/peek'));
+    const data = await resp.json() as { remaining?: number; reset?: number; retryAfter?: number };
+    return {
+      'X-RateLimit-Limit': String(RATE_LIMIT),
+      'X-RateLimit-Remaining': String(data.remaining ?? RATE_LIMIT),
+      'X-RateLimit-Reset': String(data.reset ?? data.retryAfter ?? 3600),
+    };
+  } catch {
+    return {
+      'X-RateLimit-Limit': String(RATE_LIMIT),
+      'X-RateLimit-Remaining': String(RATE_LIMIT),
+    };
+  }
 }
 
 // ── Static content ───────────────────────────────────────────────

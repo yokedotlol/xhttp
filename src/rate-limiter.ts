@@ -49,6 +49,7 @@ export class RateLimiterV2DO implements DurableObject {
         allowed: false,
         remaining: 0,
         retryAfter,
+        reset: window.start + RATE_WINDOW,
       });
     }
 
@@ -65,6 +66,8 @@ export class RateLimiterV2DO implements DurableObject {
     return Response.json({
       allowed: true,
       remaining: RATE_LIMIT - window.count,
+      reset: window.start + RATE_WINDOW,
+      retryAfter: RATE_WINDOW - (now - window.start),
     });
   }
 
@@ -74,11 +77,13 @@ export class RateLimiterV2DO implements DurableObject {
     const window = await this.state.storage.get<RateLimitState>('window');
 
     if (!window || now - window.start >= RATE_WINDOW) {
-      return Response.json({ remaining: RATE_LIMIT });
+      return Response.json({ remaining: RATE_LIMIT, reset: now + RATE_WINDOW });
     }
 
     return Response.json({
       remaining: Math.max(0, RATE_LIMIT - window.count),
+      reset: window.start + RATE_WINDOW,
+      retryAfter: Math.max(0, window.start + RATE_WINDOW - now),
     });
   }
 
