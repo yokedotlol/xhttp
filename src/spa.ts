@@ -558,7 +558,7 @@ function cliPage(): string {
   <p style="display:flex;gap:6px;flex-wrap:wrap">
     <span style="display:inline-block;background:#1a1520;border:1px solid #2a2030;border-radius:4px;padding:2px 8px;font-size:12px;color:#d4a24c">MIT</span>
     <span style="display:inline-block;background:#1a1520;border:1px solid #2a2030;border-radius:4px;padding:2px 8px;font-size:12px;color:#d4a24c">Go</span>
-    <span style="display:inline-block;background:#1a1520;border:1px solid #2a2030;border-radius:4px;padding:2px 8px;font-size:12px;color:#d4a24c">Zero dependencies</span>
+    <span style="display:inline-block;background:#1a1520;border:1px solid #2a2030;border-radius:4px;padding:2px 8px;font-size:12px;color:#d4a24c">Local-first</span>
   </p>
   <p style="margin-top:0.75rem;padding:8px 12px;background:#111116;border-left:3px solid #3fb950;border-radius:4px;font-size:12px;color:#8e8e9a">🔒 <strong style="color:#3fb950">Privacy:</strong> By default, this CLI never contacts xhttp.lol servers. All analysis runs directly from your machine to the target domain. The <code style="color:#d4a24c">--api</code> flag optionally routes requests through xhttp.lol for comparison. <a href="https://github.com/yokedotlol/xhttp" style="color:#d4a24c">You can always self-host if you need privacy.</a></p>
   </div>
