@@ -12,7 +12,7 @@ import { decodeCORSError } from './cors-error-decoder';
 import { trackScan, handleUsage } from './usage';
 import { fetchDomainSignals } from './services/domain-intel';
 
-const VERSION = '1.0.0';
+const VERSION = '2.0.0';
 const CACHE_TTL = 3600; // 1 hour
 const RATE_LIMIT = 60;
 
