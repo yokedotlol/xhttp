@@ -535,11 +535,12 @@ function aboutPage(): string {
 function privacyPage(): string {
   return `<div class="prose">
   <h2>Privacy</h2>
-  <p>xhttp.lol does not collect personal data. There are no accounts, cookies, third-party analytics, tracking pixels, or third-party scripts.</p>
+  <p>xhttp.lol does not collect personal data beyond rate limiting. There are no accounts, cookies, third-party analytics, tracking pixels, or third-party scripts.</p>
   <p>Cloudflare processes requests as our CDN and compute provider. Their standard edge logs (IP, URL, timestamp) are subject to <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare's privacy policy</a>. We do not access, store, or process these logs.</p>
   <p>Rate limiting uses an IP-derived counter in a Cloudflare Durable Object. These counters expire automatically after one hour and contain no personally identifiable information beyond a hashed IP key.</p>
-  <p>Scan results are cached for one hour in Cloudflare KV, keyed by domain name. Cached data contains only publicly observable HTTP response headers — no private information.</p>
-  <p>We log aggregate scan counts per day (no domain names, no IPs) for capacity planning.</p>
+  <p>Scan results are cached for one hour in Cloudflare KV, keyed by domain and scan type (full, cors, csp, headers, chain, cache). Cached data contains only publicly observable HTTP response data and derived analysis — no private information.</p>
+  <p>TLS enrichment is performed by a Fly.io-hosted probe (yoke-probe.fly.dev). The probe receives only the target domain name — no client information is forwarded. Fly.io processes these requests subject to <a href="https://fly.io/legal/privacy/">Fly.io's privacy policy</a>. We do not store probe logs.</p>
+  <p>We log aggregate scan counts per day (no domain names, no IPs), retained 7 days for capacity planning.</p>
   <p><a href="mailto:hello@yoke.lol">hello@yoke.lol</a> for questions.</p>
   </div>`;
 }
@@ -677,6 +678,6 @@ function apiDocsPage(): string {
   <p>Evaluate a CSP string. Body: <code>{"policy":"default-src 'self'; script-src …"}</code></p>
 
   <h3>Response format</h3>
-  <p>All domain scan responses include <code>_meta.links</code> pointing to <a href="https://yoke.lol">yoke.lol</a> for deeper analysis — full report, TLS details, and DNS details all link to the comprehensive domain intelligence dashboard.</p>
+  <p>All domain scan responses include <code>_meta.links</code> with related resources: <code>full_report</code> on <a href="https://yoke.lol">yoke.lol</a>, <code>tls_details</code> on <a href="https://certs.lol">certs.lol</a>, <code>dns_details</code> on <a href="https://ns.lol">ns.lol</a>, and <code>email_validation</code> on <a href="https://vrfy.lol">vrfy.lol</a>.</p>
   </div>`;
 }
