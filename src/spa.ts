@@ -535,9 +535,11 @@ function aboutPage(): string {
 function privacyPage(): string {
   return `<div class="prose">
   <h2>Privacy</h2>
-  <p>xhttp.lol does not track you. No cookies, no analytics, no advertising, no account required.</p>
-  <p>We log scan counts per day (no domain names, no IPs) for capacity planning. Rate limiting uses an IP-derived hashed key in a Cloudflare Durable Object that expires after one hour.</p>
-  <p>Scan results are cached for one hour in Cloudflare KV, keyed by domain name. No personal data is stored.</p>
+  <p>xhttp.lol does not collect personal data. There are no accounts, cookies, third-party analytics, tracking pixels, or third-party scripts.</p>
+  <p>Cloudflare processes requests as our CDN and compute provider. Their standard edge logs (IP, URL, timestamp) are subject to <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare's privacy policy</a>. We do not access, store, or process these logs.</p>
+  <p>Rate limiting uses an IP-derived counter in a Cloudflare Durable Object. These counters expire automatically after one hour and contain no personally identifiable information beyond a hashed IP key.</p>
+  <p>Scan results are cached for one hour in Cloudflare KV, keyed by domain name. Cached data contains only publicly observable HTTP response headers — no private information.</p>
+  <p>We log aggregate scan counts per day (no domain names, no IPs) for capacity planning.</p>
   <p><a href="mailto:hello@yoke.lol">hello@yoke.lol</a> for questions.</p>
   </div>`;
 }
