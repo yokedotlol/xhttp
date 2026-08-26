@@ -11,6 +11,7 @@ import { analyzeCacheBehavior } from './cache-analysis';
 import { decodeCORSError } from './cors-error-decoder';
 import { trackScan, handleUsage } from './usage';
 import { fetchDomainSignals } from './services/domain-intel';
+import openApiSpec from './openapi.json';
 
 const VERSION = '2.0.0';
 const CACHE_TTL = 3600; // 1 hour
@@ -79,6 +80,19 @@ export async function handleRequest(request: Request, env: Env, ctx: ExecutionCo
   const path = url.pathname;
   const method = request.method;
 
+  // ── OpenAPI spec — not rate-limited, CORS enabled, 1h cache ──────
+  if (path === '/openapi.json' || path === '/api/openapi.json') {
+    return new Response(JSON.stringify(openApiSpec, null, 2), {
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'public, max-age=3600',
+        ...SECURITY_HEADERS,
+        'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'",
+      },
+    });
+  }
+
   // ── Static routes ──────────────────────────────────────────────
   if (path === '/health') return jsonResponse({ status: 'ok', version: VERSION });
   if (path === '/robots.txt') return new Response(robotsTxt(), { headers: { 'Content-Type': 'text/plain' } });
@@ -105,7 +119,7 @@ export async function handleRequest(request: Request, env: Env, ctx: ExecutionCo
         identifier: "urn:air:xhttp.lol:api:http-analysis",
         displayName: "xhttp.lol HTTP Header Analysis API",
         type: "application/openapi+json",
-        url: "https://xhttp.lol/api/docs",
+        url: "https://xhttp.lol/openapi.json",
         description: "Free HTTP security header analysis API — CORS, CSP, cache, redirects, error decoding. Scans real response headers. No auth required.",
         representativeQueries: [
           "analyze HTTP security headers for a domain",
