@@ -524,7 +524,7 @@ function aboutPage(): string {
   <h3>Why?</h3>
   <p>Because CORS errors are the most frustrating part of web development. Because CSP policies are hard to get right. Because you shouldn't need to memorize which security headers exist and what they do. One command. Real answers. Fix suggestions with actual server configs.</p>
   <h3>How it works</h3>
-  <p>We send real HTTP requests to your target (including OPTIONS preflight requests) and analyze every response header. No JavaScript execution, no screenshots, no third-party APIs — just HTTP analysis at the protocol level.</p>
+  <p>We send real HTTP requests to your target (including OPTIONS preflight requests) and analyze every response header. There is no JavaScript execution or screenshotting. TLS enrichment runs through our Fly.io-hosted probe, and domain signals may come from Yoke through a private service binding.</p>
   <h3>Part of the .lol family</h3>
   <p><a href="https://yoke.lol">yoke.lol</a> — full domain intelligence · <a href="https://certs.lol">certs.lol</a> — TLS/SSL analysis · <a href="https://ns.lol">ns.lol</a> — DNS toolkit · <a href="https://vrfy.lol">vrfy.lol</a> — email validation</p>
   <h3>Contact</h3>
