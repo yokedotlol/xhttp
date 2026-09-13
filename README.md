@@ -62,6 +62,12 @@ curl -s https://xhttp.lol/example.com | jq
 
 See [xhttp.lol/api/docs](https://xhttp.lol/api/docs) for the full API reference.
 
+## Privacy
+
+By default, this CLI never contacts xhttp.lol servers — all analysis runs directly from
+your machine to the target domain. The `--api` flag optionally routes requests through
+xhttp.lol for comparison. You can always self-host if you need privacy.
+
 ## Family
 
 Part of the [.lol developer tools](https://yoke.lol) family:
