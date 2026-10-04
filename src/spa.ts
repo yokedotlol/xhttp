@@ -535,7 +535,7 @@ function aboutPage(): string {
 function privacyPage(): string {
   return `<div class="prose">
   <h2>Privacy</h2>
-  <p>xhttp.lol does not collect personal data beyond rate limiting. There are no accounts, cookies, third-party analytics, tracking pixels, or third-party scripts.</p>
+  <p>xhttp.lol does not collect personal data beyond rate limiting. There are no accounts, cookies, third-party analytics, or tracking pixels. The web UI loads fonts from Google Fonts, which receives your IP address when the font stylesheet is fetched.</p>
   <p>Cloudflare processes requests as our CDN and compute provider. Their standard edge logs (IP, URL, timestamp) are subject to <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare's privacy policy</a>. We do not access, store, or process these logs.</p>
   <p>Rate limiting uses an IP-derived counter in a Cloudflare Durable Object. These counters expire automatically after one hour and contain no personally identifiable information beyond a hashed IP key.</p>
   <p>Scan results are cached for one hour in Cloudflare KV, keyed by domain and scan type (full, cors, csp, headers, chain, cache). Cached data contains only publicly observable HTTP response data and derived analysis — no private information.</p>
