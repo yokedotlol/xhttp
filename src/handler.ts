@@ -133,6 +133,7 @@ export async function handleRequest(request: Request, env: Env, ctx: ExecutionCo
   }
   if (path === '/install.sh') return Response.redirect('https://raw.githubusercontent.com/yokedotlol/xhttp/main/cli/install.sh', 302);
   if (path === '/usage' && request.headers.get('Authorization') === `Bearer ${env.ADMIN_KEY}`) return handleUsage(env);
+  if (path === '/usage') return jsonResponse({ error: 'Unauthorized' }, 401);
 
   // ── POST endpoints ─────────────────────────────────────────────
   if (method === 'POST') {
