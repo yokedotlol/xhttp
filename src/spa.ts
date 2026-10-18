@@ -641,7 +641,7 @@ function cliPage(): string {
     <span class="kw">$</span> curl -s <span class="str">xhttp.lol/example.com</span> | jq
   </div>
   <div class="prose">
-  <p style="font-size:12px;color:#5c5c6b">The API runs analysis server-side. Rate limited to 60 requests/hour. <a href="/api/docs" style="color:#d4a24c">Full API docs →</a></p>
+  <p style="font-size:12px;color:#5c5c6b">The API runs analysis server-side. Fresh scans are rate limited to 60 requests/hour per IP; cached results don't count toward the limit. <a href="/api/docs" style="color:#d4a24c">Full API docs →</a></p>
   </div>`;
 }
 
@@ -650,6 +650,9 @@ function apiDocsPage(): string {
   <h2>API Documentation</h2>
   <p>Scan endpoints return JSON (HTML for browsers). No authentication required. Fresh scans are rate limited to 60 requests/hour per IP; cached results don't count toward the limit, and static, docs, and health routes are not limited.</p>
   <p><a href="/openapi.json">OpenAPI 3.1 spec</a> · <a href="/.well-known/ai-catalog.json">AI catalog</a> — agent-friendly discovery.</p>
+
+  <h3>Privacy</h3>
+  <p>No accounts, no tracking. Scan results are cached for one hour in Cloudflare KV, keyed by domain and scan type. Usage is logged only as aggregate scan counts per day (no domain names, no IPs), retained 7 days, and rate limiting keys on a hashed IP. TLS enrichment uses a Fly.io probe that receives only the target domain. Full policy: <a href="/privacy">Privacy</a>.</p>
 
   <h3>GET /{domain}</h3>
   <p>Full scan — security headers, CSP, CORS, redirect chain, cache behavior. Returns HTML for browsers, JSON for everything else.</p>
