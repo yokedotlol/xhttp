@@ -20,7 +20,7 @@ Formerly preflight.lol — renamed to xhttp.lol in June 2026.
 
 ### Storage
 - **KV `CACHE`** — scan result cache (1hr TTL). Cache keys are `scan:{domain}:{route}`.
-- **Durable Object `RateLimiterDO`** — per-IP rate limiting (60/hr).
+- **Durable Object `RateLimiterV2DO`** — per-IP rate limiting (60/hr).
 
 ### External Dependencies
 - **Yoke Fly probe** — TLS version detection via `PROBE_URL` env var. Degrades gracefully if unavailable.

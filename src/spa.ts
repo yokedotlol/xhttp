@@ -648,7 +648,7 @@ function cliPage(): string {
 function apiDocsPage(): string {
   return `<div class="prose">
   <h2>API Documentation</h2>
-  <p>All endpoints return JSON. No authentication required. Rate limited to 60 requests/hour per IP.</p>
+  <p>Scan endpoints return JSON (HTML for browsers). No authentication required. Fresh scans are rate limited to 60 requests/hour per IP; cached results don't count toward the limit, and static, docs, and health routes are not limited.</p>
   <p><a href="/openapi.json">OpenAPI 3.1 spec</a> · <a href="/.well-known/ai-catalog.json">AI catalog</a> — agent-friendly discovery.</p>
 
   <h3>GET /{domain}</h3>

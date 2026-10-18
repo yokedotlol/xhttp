@@ -8,7 +8,7 @@
 
 | Component | Version | Source |
 |-----------|---------|--------|
-| Worker (service) | 1.0.0 | `VERSION` constant in `handler.ts` |
+| Worker (service) | 2.0.0 | `VERSION` constant in `handler.ts` |
 | CLI | — | `cli/main.go` (exists, Go binary, install.sh) |
 
 ## Analysis Axes
@@ -50,7 +50,7 @@
 | Cache TTL | 1 hour |
 | Probe | Shared Yoke Fly probe (`PROBE_URL`) |
 | CI | GitHub Actions: typecheck + deploy + smoke tests |
-| Tag | v1.0.0 |
+| Tag | v2.0.0 |
 
 ## Static Pages
 

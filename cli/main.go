@@ -603,13 +603,16 @@ By default, all analysis runs locally. Use --api to query xhttp.lol instead.`,
 			if jsonOutput {
 				enc := json.NewEncoder(os.Stdout)
 				enc.SetIndent("", "  ")
-				return enc.Encode(result)
+				if err := enc.Encode(result); err != nil {
+					return err
+				}
+				return issuesExitCode(result.CORS.Issues)
 			}
 
 			fmt.Println()
 			fmt.Printf("  %s — %s\n\n", titleStyle.Render("CORS"), labelStyle.Render(domain))
 			renderCORS(result.CORS)
-			return nil
+			return issuesExitCode(result.CORS.Issues)
 		},
 	}
 
@@ -629,16 +632,20 @@ By default, all analysis runs locally. Use --api to query xhttp.lol instead.`,
 			secResult := analyzeSecurityHeaders(headers)
 			result := SubHeaders{URL: "https://" + domain, SecurityHeaders: secResult, Meta: buildSubMeta(domain)}
 
+			hdrIssues := func() []Finding { var f []Finding; for _, hc := range result.SecurityHeaders.Headers { f = append(f, hc.Issues...) }; return f }()
 			if jsonOutput {
 				enc := json.NewEncoder(os.Stdout)
 				enc.SetIndent("", "  ")
-				return enc.Encode(result)
+				if err := enc.Encode(result); err != nil {
+					return err
+				}
+				return issuesExitCode(hdrIssues)
 			}
 
 			fmt.Println()
 			fmt.Printf("  %s — %s\n\n", titleStyle.Render("Security Headers"), labelStyle.Render(domain))
 			renderSecurityHeaders(result.SecurityHeaders)
-			return nil
+			return issuesExitCode(hdrIssues)
 		},
 	}
 
@@ -666,12 +673,21 @@ By default, all analysis runs locally. Use --api to query xhttp.lol instead.`,
 			if jsonOutput {
 				enc := json.NewEncoder(os.Stdout)
 				enc.SetIndent("", "  ")
-				return enc.Encode(result)
+				if err := enc.Encode(result); err != nil {
+					return err
+				}
+				if result.CSP != nil {
+					return issuesExitCode(result.CSP.Issues)
+				}
+				return nil
 			}
 
 			fmt.Println()
 			fmt.Printf("  %s — %s\n\n", titleStyle.Render("CSP"), labelStyle.Render(domain))
 			renderCSP(result.CSP)
+			if result.CSP != nil {
+				return issuesExitCode(result.CSP.Issues)
+			}
 			return nil
 		},
 	}
@@ -694,13 +710,16 @@ By default, all analysis runs locally. Use --api to query xhttp.lol instead.`,
 			if jsonOutput {
 				enc := json.NewEncoder(os.Stdout)
 				enc.SetIndent("", "  ")
-				return enc.Encode(result)
+				if err := enc.Encode(result); err != nil {
+					return err
+				}
+				return issuesExitCode(result.RedirectChain.Issues)
 			}
 
 			fmt.Println()
 			fmt.Printf("  %s — %s\n\n", titleStyle.Render("Redirect Chain"), labelStyle.Render(domain))
 			renderRedirectChain(result.RedirectChain)
-			return nil
+			return issuesExitCode(result.RedirectChain.Issues)
 		},
 	}
 
@@ -723,13 +742,16 @@ By default, all analysis runs locally. Use --api to query xhttp.lol instead.`,
 			if jsonOutput {
 				enc := json.NewEncoder(os.Stdout)
 				enc.SetIndent("", "  ")
-				return enc.Encode(result)
+				if err := enc.Encode(result); err != nil {
+					return err
+				}
+				return issuesExitCode(result.Cache.Issues)
 			}
 
 			fmt.Println()
 			fmt.Printf("  %s — %s\n\n", titleStyle.Render("Cache"), labelStyle.Render(domain))
 			renderCache(result.Cache)
-			return nil
+			return issuesExitCode(result.Cache.Issues)
 		},
 	}
 
@@ -853,14 +875,13 @@ func cleanDomain(s string) string {
 	return s
 }
 
-// exitCode returns an error (nonzero exit) when the scan found critical issues.
+// issuesExitCode maps findings to the documented exit codes:
 // 0 = all good, 1 = warnings only, 2 = critical/high issues.
-func exitCode(result *ScanResult) error {
+func issuesExitCode(lists ...[]Finding) error {
 	hasCritical := false
 	hasWarning := false
-
-	for _, hc := range result.SecurityHeaders.Headers {
-		for _, iss := range hc.Issues {
+	for _, list := range lists {
+		for _, iss := range list {
 			if iss.Severity == "critical" || iss.Severity == "high" {
 				hasCritical = true
 			} else if iss.Severity == "warning" {
@@ -868,25 +889,6 @@ func exitCode(result *ScanResult) error {
 			}
 		}
 	}
-
-	if result.CSP != nil {
-		for _, iss := range result.CSP.Issues {
-			if iss.Severity == "critical" || iss.Severity == "high" {
-				hasCritical = true
-			} else if iss.Severity == "warning" {
-				hasWarning = true
-			}
-		}
-	}
-
-	for _, iss := range result.CORS.Issues {
-		if iss.Severity == "critical" || iss.Severity == "high" {
-			hasCritical = true
-		} else if iss.Severity == "warning" {
-			hasWarning = true
-		}
-	}
-
 	if hasCritical {
 		return &exitErr{code: 2}
 	}
@@ -894,6 +896,48 @@ func exitCode(result *ScanResult) error {
 		return &exitErr{code: 1}
 	}
 	return nil
+}
+
+// rawIssuesExitCode scans a raw JSON payload for embedded findings
+// (any object with a "severity" field) and maps them to exit codes.
+func rawIssuesExitCode(raw json.RawMessage) error {
+	var v interface{}
+	if err := json.Unmarshal(raw, &v); err != nil {
+		return nil
+	}
+	var findings []Finding
+	var walk func(x interface{})
+	walk = func(x interface{}) {
+		switch t := x.(type) {
+		case map[string]interface{}:
+			if sev, ok := t["severity"].(string); ok {
+				findings = append(findings, Finding{Severity: sev})
+			}
+			for _, val := range t {
+				walk(val)
+			}
+		case []interface{}:
+			for _, val := range t {
+				walk(val)
+			}
+		}
+	}
+	walk(v)
+	return issuesExitCode(findings)
+}
+
+// exitCode returns an error (nonzero exit) when the scan found critical issues.
+// 0 = all good, 1 = warnings only, 2 = critical/high issues.
+// Covers every section of the scan — headers, CSP, CORS, redirect chain, cache.
+func exitCode(result *ScanResult) error {
+	lists := [][]Finding{result.CORS.Issues, result.RedirectChain.Issues, result.Cache.Issues}
+	for _, hc := range result.SecurityHeaders.Headers {
+		lists = append(lists, hc.Issues)
+	}
+	if result.CSP != nil {
+		lists = append(lists, result.CSP.Issues)
+	}
+	return issuesExitCode(lists...)
 }
 
 type exitErr struct {
@@ -924,7 +968,10 @@ func runAPIFullScan(domain string, jsonOutput bool) error {
 		}
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
-		return enc.Encode(raw)
+		if err := enc.Encode(raw); err != nil {
+			return err
+		}
+		return rawIssuesExitCode(raw)
 	}
 
 	var result ScanResult
@@ -965,6 +1012,7 @@ func runAPISubScan(domain, subRoute string, jsonOutput bool) error {
 		fmt.Println()
 		fmt.Printf("  %s — %s\n\n", titleStyle.Render("CORS"), labelStyle.Render(domain))
 		renderCORS(result.CORS)
+		return issuesExitCode(result.CORS.Issues)
 	case "headers":
 		var result SubHeaders
 		if err := fetchJSON(url, &result); err != nil {
@@ -973,6 +1021,7 @@ func runAPISubScan(domain, subRoute string, jsonOutput bool) error {
 		fmt.Println()
 		fmt.Printf("  %s — %s\n\n", titleStyle.Render("Security Headers"), labelStyle.Render(domain))
 		renderSecurityHeaders(result.SecurityHeaders)
+		return issuesExitCode(func() []Finding { var f []Finding; for _, hc := range result.SecurityHeaders.Headers { f = append(f, hc.Issues...) }; return f }())
 	case "csp":
 		var result SubCSP
 		if err := fetchJSON(url, &result); err != nil {
@@ -981,6 +1030,10 @@ func runAPISubScan(domain, subRoute string, jsonOutput bool) error {
 		fmt.Println()
 		fmt.Printf("  %s — %s\n\n", titleStyle.Render("CSP"), labelStyle.Render(domain))
 		renderCSP(result.CSP)
+		if result.CSP != nil {
+			return issuesExitCode(result.CSP.Issues)
+		}
+		return nil
 	case "chain":
 		var result SubChain
 		if err := fetchJSON(url, &result); err != nil {
@@ -989,6 +1042,7 @@ func runAPISubScan(domain, subRoute string, jsonOutput bool) error {
 		fmt.Println()
 		fmt.Printf("  %s — %s\n\n", titleStyle.Render("Redirect Chain"), labelStyle.Render(domain))
 		renderRedirectChain(result.RedirectChain)
+		return issuesExitCode(result.RedirectChain.Issues)
 	case "cache":
 		var result SubCache
 		if err := fetchJSON(url, &result); err != nil {
@@ -997,6 +1051,7 @@ func runAPISubScan(domain, subRoute string, jsonOutput bool) error {
 		fmt.Println()
 		fmt.Printf("  %s — %s\n\n", titleStyle.Render("Cache"), labelStyle.Render(domain))
 		renderCache(result.Cache)
+		return issuesExitCode(result.Cache.Issues)
 	}
 
 	return nil

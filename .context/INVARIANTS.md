@@ -29,8 +29,8 @@
 
 ## Privacy & Security
 
-- [ ] **No raw user IPs in storage.** Rate limiting uses DO keyed by IP, but no IPs in KV or logs.
-  - _Verify:_ Check rate limiter — IPs used as DO keys only, not persisted.
+- [ ] **No raw user IPs in storage.** Rate limiting uses a DO keyed by the salted SHA-256 hash of the IP, and no IPs in KV or logs.
+  - _Verify:_ Check rate limiter — only salted IP hashes used as DO keys, not persisted.
 
 - [ ] **Security headers on every response.** CSP, HSTS, X-Content-Type-Options, X-Frame-Options, etc.
   - _Verify:_ Check `SECURITY_HEADERS` and `secHeaders()` in `handler.ts`.
