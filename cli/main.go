@@ -574,7 +574,10 @@ By default, all analysis runs locally. Use --api to query xhttp.lol instead.`,
 			if jsonOutput {
 				enc := json.NewEncoder(os.Stdout)
 				enc.SetIndent("", "  ")
-				return enc.Encode(result)
+				if err := enc.Encode(result); err != nil {
+					return err
+				}
+				return exitCode(result)
 			}
 
 			renderFullScan(result)
@@ -1000,7 +1003,10 @@ func runAPISubScan(domain, subRoute string, jsonOutput bool) error {
 		}
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
-		return enc.Encode(raw)
+		if err := enc.Encode(raw); err != nil {
+			return err
+		}
+		return rawIssuesExitCode(raw)
 	}
 
 	switch subRoute {

@@ -95,7 +95,7 @@ export async function handleRequest(request: Request, env: Env, ctx: ExecutionCo
 
   // ── Static routes ──────────────────────────────────────────────
   if (path === '/health') return jsonResponse({ status: 'ok', version: VERSION });
-  if (path === '/robots.txt') return new Response(robotsTxt(), { headers: { 'Content-Type': 'text/plain' } });
+  if (path === '/robots.txt') return new Response(robotsTxt(), { headers: { 'Content-Type': 'text/plain', ...SECURITY_HEADERS } });
   if (path === '/sitemap.xml') return new Response(sitemapXml(), { headers: { 'Content-Type': 'application/xml', ...SECURITY_HEADERS } });
   if (path === '/security.txt' || path === '/.well-known/security.txt') return new Response(securityTxt(), { headers: { 'Content-Type': 'text/plain', ...SECURITY_HEADERS } });
   if (path === '/llms.txt') return new Response(llmsTxt(), { headers: { 'Content-Type': 'text/plain', ...SECURITY_HEADERS } });
@@ -129,7 +129,7 @@ export async function handleRequest(request: Request, env: Env, ctx: ExecutionCo
         ],
       }],
     };
-    return new Response(JSON.stringify(catalog, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=86400' } });
+    return new Response(JSON.stringify(catalog, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=86400', ...SECURITY_HEADERS } });
   }
   if (path === '/install.sh') return Response.redirect('https://raw.githubusercontent.com/yokedotlol/xhttp/main/cli/install.sh', 302);
   if (path === '/usage' && request.headers.get('Authorization') === `Bearer ${env.ADMIN_KEY}`) return handleUsage(env);

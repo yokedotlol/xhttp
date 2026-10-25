@@ -50,7 +50,7 @@
 | Cache TTL | 1 hour |
 | Probe | Shared Yoke Fly probe (`PROBE_URL`) |
 | CI | GitHub Actions: typecheck + deploy + smoke tests |
-| Tag | v2.0.0 |
+| Tag | v1.0.0 (latest git tag; worker version 2.0.0 is untagged) |
 
 ## Static Pages
 

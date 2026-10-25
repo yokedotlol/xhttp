@@ -626,7 +626,7 @@ function cliPage(): string {
   <table style="width:100%;border-collapse:collapse;font-size:13px;margin:0.75rem 0">
     <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">0</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Scan succeeded, no critical issues</td></tr>
     <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">1</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Scan succeeded, warnings found</td></tr>
-    <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">2</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Critical/high severity issues or usage error</td></tr>
+    <tr><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#e0e0ea;white-space:nowrap"><code style="color:#d4a24c;font-size:12px">2</code></td><td style="padding:6px 12px;border-bottom:1px solid #1a1520;color:#8e8e9a">Critical/high severity issues</td></tr>
   </table>
 
   <h3>Source</h3>
